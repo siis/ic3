@@ -1,0 +1,270 @@
+/*
+ * Copyright (C) 2015 The Pennsylvania State University and the University of Wisconsin
+ * Systems and Internet Infrastructure Security Laboratory
+ *
+ * Author: Damien Octeau
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+class android.net.Uri {
+  String scheme(1);
+  String ssp(1);
+  String fragment(1);
+  String uri(1);
+  String path(1);
+  String uriQuery(1);
+  String authority(1);
+  String appendedPaths;
+  String appendedQueries;
+
+
+  copy <android.net.Uri: android.net.Uri withAppendedPath(android.net.Uri,java.lang.String)> {
+    0;
+    1: add appendedPaths;
+  }
+  copy <android.content.ContentUris: android.net.Uri withAppendedId(android.net.Uri,long)> {
+    0;
+    1: add appendedPaths, type int;
+  }
+
+  mod gen <android.net.Uri: android.net.Uri fromFile(java.io.File)> {
+    replace uri "file://(.*)";
+  }
+  mod gen <android.net.Uri: android.net.Uri fromParts(java.lang.String,java.lang.String,java.lang.String)> {
+    0: replace scheme;
+    1: replace ssp;
+    2: replace fragment;
+  }
+  mod gen <android.net.Uri: android.net.Uri parse(java.lang.String)> {
+    0: replace uri;
+  }
+  mod gen <android.provider.MediaStore$Audio$Media: android.net.Uri getContentUriForPath(java.lang.String)> {
+    replace uri "content://media/external/audio/media";
+    replace uri "content://media/internal/audio/media";
+  }
+  
+  mod copy <android.net.Uri: android.net.Uri$Builder buildUpon()> {}
+  mod copy <android.net.Uri: android.net.Uri normalizeScheme()> {}
+
+  source <android.net.Uri: java.lang.String getAuthority()> {
+    authority;
+  }
+  source <android.net.Uri: java.lang.String getEncodedAuthority()> {
+    authority;
+  }
+  source <android.net.Uri: java.lang.String getEncodedFragment()> {
+    fragment;
+  }
+  source <android.net.Uri: java.lang.String getEncodedPath()> {
+    path;
+  }
+  source <android.net.Uri: java.lang.String getEncodedQuery()> {
+    uriQuery;
+  }
+  source <android.net.Uri: java.lang.String getEncodedSchemeSpecificPart()> {
+    ssp;
+  }
+  source <android.net.Uri: java.lang.String getFragment()> {
+    fragment;
+  }
+  source <android.net.Uri: java.lang.String getPath()> {
+    path;
+  }
+  source <android.net.Uri: java.lang.String getQuery()> {
+    uriQuery;
+  }
+  source <android.net.Uri: java.lang.String getScheme()> {
+    scheme;
+  }
+  source <android.net.Uri: java.lang.String getSchemeSpecificPart()> {
+    ssp;
+  }
+
+  argument uri0 = 0: type android.net.Uri, prop "valueType": "provider";
+  query <android.content.ContentResolver: android.content.ContentProviderClient acquireContentProviderClient(android.net.Uri)> {
+    argument uri0;
+  }
+  query <android.content.ContentResolver: android.content.ContentProviderClient acquireContentProviderClient(java.lang.Uri)> {
+    argument uri0;
+  }
+  query <android.content.ContentResolver: android.content.ContentProviderClient acquireUnstableContentProviderClient(android.net.Uri)> {
+    argument uri0;
+  }
+  query <android.content.ContentResolver: android.content.ContentProviderClient acquireUnstableContentProviderClient(java.lang.Uri)> {
+    argument uri0;
+  }
+  argument stringAuthority0 = 0: type String, prop "valueType": "authority";
+  query <android.content.ContentResolver: android.content.ContentProviderResult[] applyBatch(java.lang.String,java.util.ArrayList)> {
+    argument stringAuthority0;
+  }
+  query <android.content.ContentResolver: int bulkInsert(android.net.Uri,android.content.ContentValues)> {
+    argument uri0;
+  }
+  query <android.content.ContentResolver: android.os.Bundle call(android.net.Uri,java.lang.String,java.lang.String,android.os.Bundle)> {
+    argument uri0;
+  }
+  query <android.content.ContentResolver: int delete(android.net.Uri,java.lang.String,java.lang.String[])> {
+    argument uri0;
+  }
+  query <android.content.ContentResolver: android.net.Uri insert(android.net.Uri,android.content.ContentValues)> {
+    argument uri0;
+  }
+  query <android.content.ContentResolver: void notifyChange(android.net.Uri,android.database.ContentObserver,boolean)> {
+    argument uri0;
+  }
+  query <android.content.ContentResolver: void notifyChange(android.net.Uri,android.database.ContentObserver)> {
+    argument uri0;
+  }
+  query <android.content.ContentResolver: android.database.Cursor query(android.net.Uri,java.lang.String[],java.lang.String,java.lang.String[],java.lang.String)> {
+    argument uri0;
+  }
+  query <android.content.ContentResolver: android.database.Cursor query(android.net.Uri,java.lang.String[],java.lang.String,java.lang.String[],java.lang.String,android.os.CancellationSignal)> {
+    argument uri0;
+  }
+  query <android.content.ContentResolver: void registerContentObserver(android.net.Uri,boolean,android.database.ContentObserver)> {
+    argument uri0;
+  }
+  query <android.content.ContentResolver: int update(android.net.Uri,android.content.ContentValues,java.lang.String,java.lang.String[])> {
+    argument uri0;
+  }
+  staticfield uri <android.net.Uri: android.net.Uri EMPTY> = "";
+  staticfield uri <android.provider.Browser: android.net.Uri BOOKMARKS_URI> = "content://browser/bookmarks";
+  staticfield uri <android.provider.Browser: android.net.Uri SEARCHES_URI> = "content://browser/searches";
+  staticfield uri <android.provider.MediaStore$Images$Thumbnails: android.net.Uri INTERNAL_CONTENT_URI> = "content://media/internal/images/thumbnails";
+  staticfield uri <android.provider.MediaStore$Images$Thumbnails: android.net.Uri EXTERNAL_CONTENT_URI> = "content://media/external/images/thumbnails";
+  staticfield uri <android.provider.MediaStore$Images$Media: android.net.Uri INTERNAL_CONTENT_URI> = "content://media/internal/images/media";
+  staticfield uri <android.provider.MediaStore$Images$Media: android.net.Uri EXTERNAL_CONTENT_URI> = "content://media/external/images/media";
+  staticfield uri <android.provider.MediaStore$Audio$Albums: android.net.Uri INTERNAL_CONTENT_URI> = "content://media/internal/audio/albums";
+  staticfield uri <android.provider.MediaStore$Audio$Albums: android.net.Uri EXTERNAL_CONTENT_URI> = "content://media/external/audio/albums";
+  staticfield uri <android.provider.MediaStore$Audio$Artists: android.net.Uri EXTERNAL_CONTENT_URI> = "content://media/external/audio/artists";
+  staticfield uri <android.provider.MediaStore$Audio$Artists: android.net.Uri INTERNAL_CONTENT_URI> = "content://media/internal/audio/artists";
+  staticfield uri <android.provider.MediaStore$Audio$Media: android.net.Uri INTERNAL_CONTENT_URI> = "content://media/internal/audio/media";
+  staticfield uri <android.provider.MediaStore$Audio$Media: android.net.Uri EXTERNAL_CONTENT_URI> = "content://media/external/audio/media";
+  staticfield uri <android.provider.MediaStore$Audio$Genres: android.net.Uri EXTERNAL_CONTENT_URI> = "content://media/external/audio/genres";
+  staticfield uri <android.provider.MediaStore$Audio$Genres: android.net.Uri INTERNAL_CONTENT_URI> = "content://media/internal/audio/genres";
+  staticfield uri <android.provider.MediaStore$Audio$Playlists: android.net.Uri EXTERNAL_CONTENT_URI> = "content://media/external/audio/playlists";
+  staticfield uri <android.provider.MediaStore$Audio$Playlists: android.net.Uri INTERNAL_CONTENT_URI> = "content://media/internal/audio/playlists";
+  staticfield uri <android.provider.MediaStore$Video$Thumbnails: android.net.Uri EXTERNAL_CONTENT_URI> = "content://media/external/video/thumbnails";
+  staticfield uri <android.provider.MediaStore$Video$Thumbnails: android.net.Uri INTERNAL_CONTENT_URI> = "content://media/internal/video/thumbnails";
+  staticfield uri <android.provider.MediaStore$Video$Media: android.net.Uri INTERNAL_CONTENT_URI> = "content://media/internal/video/media";
+  staticfield uri <android.provider.MediaStore$Video$Media: android.net.Uri EXTERNAL_CONTENT_URI> = "content://media/external/video/media";
+  staticfield uri <android.provider.Settings$Bookmarks: android.net.Uri CONTENT_URI> = "content://settings/bookmarks";
+  staticfield uri <android.provider.Settings$Secure: android.net.Uri CONTENT_URI> = "content://settings/secure";
+  staticfield uri <android.provider.Settings$System: android.net.Uri DEFAULT_RINGTONE_URI> = "content://settings/system/ringtone";
+  staticfield uri <android.provider.Settings$System: android.net.Uri CONTENT_URI> = "content://settings/system";
+  staticfield uri <android.provider.Settings$System: android.net.Uri DEFAULT_ALARM_ALERT_URI> = "content://settings/system/alarm_alert";
+  staticfield uri <android.provider.Settings$System: android.net.Uri DEFAULT_NOTIFICATION_URI> = "content://settings/system/notification_sound";
+  staticfield uri <android.provider.BrowserContract: android.net.Uri AUTHORITY_URI> = "content://com.android.browser";
+  staticfield uri <android.provider.BrowserContract$Accounts: android.net.Uri CONTENT_URI> = "content://com.android.browser/accounts";
+  staticfield uri <android.provider.BrowserContract$Settings: android.net.Uri CONTENT_URI> = "content://com.android.browser/settings";
+  staticfield uri <android.provider.BrowserContract$SyncState: android.net.Uri CONTENT_URI> = "content://com.android.browser/syncstate";
+  staticfield uri <android.provider.BrowserContract$Images: android.net.Uri CONTENT_URI> = "content://com.android.browser/images";
+  staticfield uri <android.provider.BrowserContract$Bookmarks: android.net.Uri CONTENT_URI> = "content://com.android.browser/bookmarks";
+  staticfield uri <android.provider.BrowserContract$Bookmarks: android.net.Uri CONTENT_URI_DEFAULT_FOLDER> = "content://com.android.browser/bookmarks/folder";
+  staticfield uri <android.provider.BrowserContract$History: android.net.Uri CONTENT_URI> = "content://com.android.browser/history";
+  staticfield uri <android.provider.BrowserContract$Searches: android.net.Uri CONTENT_URI> = "content://com.android.browser/searches";
+  staticfield uri <android.provider.BrowserContract$Combined: android.net.Uri CONTENT_URI> = "content://com.android.browser/combined";
+  staticfield uri <android.provider.ContactsContract: android.net.Uri AUTHORITY_URI> = "content://com.android.contacts";
+  staticfield uri <android.provider.ContactsContract$RawContacts: android.net.Uri CONTENT_URI> = "content://com.android.contacts/raw_contacts";
+  staticfield uri <android.provider.ContactsContract$Directory: android.net.Uri CONTENT_URI> = "content://com.android.contacts/directories";
+  staticfield uri <android.provider.ContactsContract$SyncState: android.net.Uri CONTENT_URI> = "content://com.android.contacts/syncstate";
+  staticfield uri <android.provider.ContactsContract$ProfileSyncState: android.net.Uri CONTENT_URI> = "content://com.android.contacts/profile/syncstate";
+  staticfield uri <android.provider.ContactsContract$Contacts: android.net.Uri CONTENT_STREQUENT_URI> = "content://com.android.contacts/contacts/strequent";
+  staticfield uri <android.provider.ContactsContract$Contacts: android.net.Uri CONTENT_URI> = "content://com.android.contacts/contacts";
+  staticfield uri <android.provider.ContactsContract$Contacts: android.net.Uri CONTENT_STREQUENT_FILTER_URI> = "content://com.android.contacts/contacts/strequent/filter";
+  staticfield uri <android.provider.ContactsContract$Contacts: android.net.Uri CONTENT_FILTER_URI> = "content://com.android.contacts/contacts/filter";
+  staticfield uri <android.provider.ContactsContract$Contacts: android.net.Uri CONTENT_LOOKUP_URI> = "content://com.android.contacts/contacts/lookup";
+  staticfield uri <android.provider.ContactsContract$Contacts: android.net.Uri CONTENT_VCARD_URI> = "content://com.android.contacts/contacts/as_vcard";
+  staticfield uri <android.provider.ContactsContract$Contacts: android.net.Uri CONTENT_MULTI_VCARD_URI> = "content://com.android.contacts/contacts/as_multi_vcard";
+  staticfield uri <android.provider.ContactsContract$Contacts: android.net.Uri CONTENT_GROUP_URI> = "content://com.android.contacts/contacts/group";
+  staticfield uri <android.provider.ContactsContract$Contacts: android.net.Uri CONTENT_FREQUENT_URI> = "content://com.android.contacts/contacts/frequent";
+  staticfield uri <android.provider.ContactsContract$Profile: android.net.Uri CONTENT_RAW_CONTACTS_URI> = "content://com.android.contacts/profile/raw_contacts";
+  staticfield uri <android.provider.ContactsContract$Profile: android.net.Uri CONTENT_URI> = "content://com.android.contacts/profile";
+  staticfield uri <android.provider.ContactsContract$Profile: android.net.Uri CONTENT_VCARD_URI> = "content://com.android.contacts/profile/as_vcard";
+  staticfield uri <android.provider.ContactsContract$StreamItems: android.net.Uri CONTENT_URI> = "content://com.android.contacts/stream_items";
+  staticfield uri <android.provider.ContactsContract$StreamItems: android.net.Uri CONTENT_PHOTO_URI> = "content://com.android.contacts/stream_items/photo";
+  staticfield uri <android.provider.ContactsContract$StreamItems: android.net.Uri CONTENT_LIMIT_URI> = "content://com.android.contacts/stream_items_limit";
+  staticfield uri <android.provider.ContactsContract$Data: android.net.Uri CONTENT_URI> = "content://com.android.contacts/data";
+  staticfield uri <android.provider.ContactsContract$RawContactsEntity: android.net.Uri CONTENT_URI> = "content://com.android.contacts/raw_contact_entities";
+  staticfield uri <android.provider.ContactsContract$RawContactsEntity: android.net.Uri PROFILE_CONTENT_URI> = "content://com.android.contacts/profile/raw_contact_entities";
+  staticfield uri <android.provider.ContactsContract$PhoneLookup: android.net.Uri CONTENT_FILTER_URI> = "content://com.android.contacts/phone_lookup";
+  staticfield uri <android.provider.ContactsContract$StatusUpdates: android.net.Uri CONTENT_URI> = "content://com.android.contacts/status_updates";
+  staticfield uri <android.provider.ContactsContract$StatusUpdates: android.net.Uri PROFILE_CONTENT_URI> = "content://com.android.contacts/profile/status_updates";
+  staticfield uri <android.provider.ContactsContract$CommonDataKinds$Phone: android.net.Uri CONTENT_FILTER_URI> = "content://com.android.contacts/data/phones/filter";
+  staticfield uri <android.provider.ContactsContract$CommonDataKinds$Phone: android.net.Uri CONTENT_URI> = "content://com.android.contacts/data/phones";
+  staticfield uri <android.provider.ContactsContract$CommonDataKinds$Email: android.net.Uri CONTENT_LOOKUP_URI> = "content://com.android.contacts/data/emails/lookup";
+  staticfield uri <android.provider.ContactsContract$CommonDataKinds$Email: android.net.Uri CONTENT_FILTER_URI> = "content://com.android.contacts/data/emails/filter";
+  staticfield uri <android.provider.ContactsContract$CommonDataKinds$Email: android.net.Uri CONTENT_URI> = "content://com.android.contacts/data/emails";
+  staticfield uri <android.provider.ContactsContract$CommonDataKinds$StructuredPostal: android.net.Uri CONTENT_URI> = "content://com.android.contacts/data/postals";
+  staticfield uri <android.provider.ContactsContract$Groups: android.net.Uri CONTENT_URI> = "content://com.android.contacts/groups";
+  staticfield uri <android.provider.ContactsContract$Groups: android.net.Uri CONTENT_SUMMARY_URI> = "content://com.android.contacts/groups_summary";
+  staticfield uri <android.provider.ContactsContract$AggregationExceptions: android.net.Uri CONTENT_URI> = "content://com.android.contacts/aggregation_exceptions";
+  staticfield uri <android.provider.ContactsContract$Settings: android.net.Uri CONTENT_URI> = "content://com.android.contacts/settings";
+  staticfield uri <android.provider.ContactsContract$ProviderStatus: android.net.Uri CONTENT_URI> = "content://com.android.contacts/provider_status";
+  staticfield uri <android.provider.ContactsContract$DataUsageFeedback: android.net.Uri FEEDBACK_URI> = "content://com.android.contacts/data/usagefeedback";
+  staticfield uri <android.provider.ContactsContract$DisplayPhoto: android.net.Uri CONTENT_URI> = "content://com.android.contacts/display_photo";
+  staticfield uri <android.provider.ContactsContract$DisplayPhoto: android.net.Uri CONTENT_MAX_DIMENSIONS_URI> = "content://com.android.contacts/photo_dimensions";
+  staticfield uri <android.provider.Applications: android.net.Uri CONTENT_URI> = "content://applications";
+  staticfield uri <android.provider.CalendarContract: android.net.Uri CONTENT_URI> = "content://com.android.calendar";
+  staticfield uri <android.provider.CalendarContract$CalendarEntity: android.net.Uri CONTENT_URI> = "content://com.android.calendar/calendar_entities";
+  staticfield uri <android.provider.CalendarContract$Calendars: android.net.Uri CONTENT_URI> = "content://com.android.calendar/calendars";
+  staticfield uri <android.provider.CalendarContract$Attendees: android.net.Uri CONTENT_URI> = "content://com.android.calendar/attendees";
+  staticfield uri <android.provider.CalendarContract$EventsEntity: android.net.Uri CONTENT_URI> = "content://com.android.calendar/event_entities";
+  staticfield uri <android.provider.CalendarContract$Events: android.net.Uri CONTENT_EXCEPTION_URI> = "content://com.android.calendar/exception";
+  staticfield uri <android.provider.CalendarContract$Events: android.net.Uri CONTENT_URI> = "content://com.android.calendar/events";
+  staticfield uri <android.provider.CalendarContract$Instances: android.net.Uri CONTENT_BY_DAY_URI> = "content://com.android.calendar/instances/whenbyday";
+  staticfield uri <android.provider.CalendarContract$Instances: android.net.Uri CONTENT_URI> = "content://com.android.calendar/instances/when";
+  staticfield uri <android.provider.CalendarContract$Instances: android.net.Uri CONTENT_SEARCH_BY_DAY_URI> = "content://com.android.calendar/instances/searchbyday";
+  staticfield uri <android.provider.CalendarContract$Instances: android.net.Uri CONTENT_SEARCH_URI> = "content://com.android.calendar/instances/search";
+  staticfield uri <android.provider.CalendarContract$CalendarCache: android.net.Uri URI> = "content://com.android.calendar/properties";
+  staticfield uri <android.provider.CalendarContract$EventDays: android.net.Uri CONTENT_URI> = "content://com.android.calendar/instances/groupbyday";
+  staticfield uri <android.provider.CalendarContract$Reminders: android.net.Uri CONTENT_URI> = "content://com.android.calendar/reminders";
+  staticfield uri <android.provider.CalendarContract$CalendarAlerts: android.net.Uri CONTENT_URI> = "content://com.android.calendar/calendar_alerts";
+  staticfield uri <android.provider.CalendarContract$CalendarAlerts: android.net.Uri CONTENT_URI_BY_INSTANCE> = "content://com.android.calendar/calendar_alerts/by_instance";
+  staticfield uri <android.provider.CalendarContract$Colors: android.net.Uri CONTENT_URI> = "content://com.android.calendar/colors";
+  staticfield uri <android.provider.CalendarContract$ExtendedProperties: android.net.Uri CONTENT_URI> = "content://com.android.calendar/extendedproperties";
+  staticfield uri <android.provider.CalendarContract$SyncState: android.net.Uri CONTENT_URI> = "content://com.android.calendar/syncstate";
+  staticfield uri <android.provider.CallLog: android.net.Uri CONTENT_URI> = "content://call_log";
+  staticfield uri <android.provider.CallLog$Calls: android.net.Uri CONTENT_URI> = "content://call_log/calls";
+  staticfield uri <android.provider.CallLog$Calls: android.net.Uri CONTENT_FILTER_URI> = "content://call_log/calls/filter";
+  staticfield uri <android.provider.CallLog$Calls: android.net.Uri CONTENT_URI_WITH_VOICEMAIL> = "content://call_log/calls?allow_voicemails=true";
+  staticfield uri <android.provider.Contacts: android.net.Uri CONTENT_URI> = "content://contacts";
+  staticfield uri <android.provider.Contacts$Settings: android.net.Uri CONTENT_URI> = "content://contacts/settings";
+  staticfield uri <android.provider.Contacts$People: android.net.Uri WITH_EMAIL_OR_IM_FILTER_URI> = "content://contacts/people/with_email_or_im_filter";
+  staticfield uri <android.provider.Contacts$People: android.net.Uri CONTENT_FILTER_URI> = "content://contacts/people/filter";
+  staticfield uri <android.provider.Contacts$People: android.net.Uri DELETED_CONTENT_URI> = "content://contacts/deleted_people";
+  staticfield uri <android.provider.Contacts$People: android.net.Uri CONTENT_URI> = "content://contacts/people";
+  staticfield uri <android.provider.Contacts$Groups: android.net.Uri CONTENT_URI> = "content://contacts/groups";
+  staticfield uri <android.provider.Contacts$Groups: android.net.Uri DELETED_CONTENT_URI> = "content://contacts/deleted_groups";
+  staticfield uri <android.provider.Contacts$GroupMembership: android.net.Uri CONTENT_URI> = "content://contacts/groupmembership";
+  staticfield uri <android.provider.Contacts$GroupMembership: android.net.Uri RAW_CONTENT_URI> = "content://contacts/groupmembershipraw";
+  staticfield uri <android.provider.Contacts$ContactMethods: android.net.Uri CONTENT_EMAIL_URI> = "content://contacts/contact_methods/email";
+  staticfield uri <android.provider.Contacts$ContactMethods: android.net.Uri CONTENT_URI> = "content://contacts/contact_methods";
+  staticfield uri <android.provider.Contacts$Presence: android.net.Uri CONTENT_URI> = "content://contacts/presence";
+  staticfield uri <android.provider.Contacts$Organizations: android.net.Uri CONTENT_URI> = "content://contacts/organizations";
+  staticfield uri <android.provider.Contacts$Photos: android.net.Uri CONTENT_URI> = "content://contacts/photos";
+  staticfield uri <android.provider.Contacts$Extensions: android.net.Uri CONTENT_URI> = "content://contacts/extensions";
+  staticfield uri <android.provider.Contacts$Phones: android.net.Uri CONTENT_URI> = "content://contacts/phones";
+  staticfield uri <android.provider.Contacts$Phones: android.net.Uri CONTENT_FILTER_URL> = "content://contacts/phones/filter";
+  staticfield uri <android.provider.Downloads$Impl: android.net.Uri CONTENT_URI> = "content://downloads/my_downloads";
+  staticfield uri <android.provider.Downloads$Impl: android.net.Uri PUBLICLY_ACCESSIBLE_DOWNLOADS_URI> = "content://downloads/public_downloads";
+  staticfield uri <android.provider.Downloads$Impl: android.net.Uri ALL_DOWNLOADS_CONTENT_URI> = "content://downloads/all_downloads";
+  staticfield uri <android.provider.DrmStore$Images: android.net.Uri CONTENT_URI> = "content://drm/images";
+  staticfield uri <android.provider.DrmStore$Audio: android.net.Uri CONTENT_URI> = "content://drm/audio";
+  staticfield uri <android.provider.UserDictionary: android.net.Uri CONTENT_URI> = "content://user_dictionary";
+  staticfield uri <android.provider.UserDictionary$Words: android.net.Uri CONTENT_URI> = "content://user_dictionary/words";
+  staticfield uri <android.provider.VoicemailContract$Voicemails: android.net.Uri CONTENT_URI> = "content://com.android.voicemail/voicemail";
+  staticfield uri <android.provider.VoicemailContract$Status: android.net.Uri CONTENT_URI> = "content://com.android.voicemail/status";
+}

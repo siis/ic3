@@ -1,0 +1,249 @@
+/*
+ * Copyright (C) 2015 The Pennsylvania State University and the University of Wisconsin
+ * Systems and Internet Infrastructure Security Laboratory
+ *
+ * Author: Damien Octeau
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+class android.os.Bundle {
+  String extras;
+
+  copy <android.os.Bundle: void <init>(android.os.Bundle)> {
+    0;
+  }
+  mod <android.os.Bundle: void clear()> {
+    clear extras;
+  }
+  mod <android.os.Bundle: void putAll(android.os.Bundle)> {
+    0: add extras, type android.os.Bundle:extras;
+  }
+  argument addExtra = 0: add extras;
+  mod <android.os.Bundle: void putBoolean(java.lang.String,boolean)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putBooleanArray(java.lang.String,boolean[])> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putBundle(java.lang.String,android.os.Bundle)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putByte(java.lang.String,byte)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putByteArray(java.lang.String,byte[])> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putChar(java.lang.String,char)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putCharArray(java.lang.String,char[])> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putCharSequence(java.lang.String,java.lang.CharSequence)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putCharSequenceArray(java.lang.String,java.lang.CharSequence[])> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putCharSequenceArrayList(java.lang.String,java.util.ArrayList)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putDouble(java.lang.String,double)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putDoubleArray(java.lang.String,double[])> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putFloat(java.lang.String,float)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putFloatArray(java.lang.String,float[])> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putInt(java.lang.String,int)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putIntArray(java.lang.String,int[])> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putIntegerArrayList(java.lang.String,java.util.ArrayList)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putLong(java.lang.String,long)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putLongArray(java.lang.String,long[])> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putParcelable(java.lang.String,android.os.Parcelable)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putParcelableArray(java.lang.String,android.os.Parcelable[])> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putParcelableArrayList(java.lang.String,java.util.ArrayList)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putSerializable(java.lang.String,java.io.Serializable)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putShort(java.lang.String,short)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putShortArray(java.lang.String,short[])> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putSparseParcelableArray(java.lang.String,android.util.SparseArray)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putString(java.lang.String,java.lang.String)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putStringArray(java.lang.String,java.lang.String[])> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void putStringArrayList(java.lang.String,java.util.ArrayList)> {
+    argument addExtra;
+  }
+  mod <android.os.Bundle: void remove(java.lang.String)> {
+    0: remove extras;
+  }
+
+  argument stringExtra0 = 0: type String, prop "valueType": "componentExtra";
+  query <android.os.Bundle: java.lang.Object get(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: android.os.Binder getBinder(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: boolean getBoolean(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: boolean getBoolean(java.lang.String,boolean)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: boolean[] getBooleanArray(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: android.os.Bundle getBundle(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: byte getByte(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: java.lang.Byte getByte(java.lang.String,byte)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: byte[] getByteArray(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: char getChar(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: char getChar(java.lang.String,char)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: char[] getCharArray(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: java.lang.CharSequence getCharSequence(java.lang.String,java.lang.CharSequence)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: java.lang.CharSequence getCharSequence(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: java.lang.CharSequence[] getCharSequenceArray(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: java.lang.ArrayList getCharSequenceArrayList(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: double getDouble(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: double getDouble(java.lang.String,double)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: double[] getDoubleArray(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: float getFloat(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: float getFloat(java.lang.String,float)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: float[] getFloatArray(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: int getInt(java.lang.String,int)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: int getInt(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: int[] getIntArray(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: java.util.ArrayList getIntegerArrayList(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: long getLong(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: long getLong(java.lang.String,long)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: long[] getLongArray(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: android.os.Parcelable getParcelable(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: android.os.Parcelable[] getParcelable(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: java.util.ArrayList getParcelableArrayList(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: java.io.Serializable getSerializable(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: short getShort(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: short getShort(java.lang.String,short)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: short[] getShortArray(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: android.util.SparseArray getSparseParcelableArray(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: java.lang.String getString(java.lang.String,java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: java.lang.String getString(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: java.lang.String[] getStringArray(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.os.Bundle: java.util.ArrayList getStringArrayList(java.lang.String)> {
+    argument stringExtra0;
+  }
+}

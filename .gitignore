@@ -1,6 +1,9 @@
+.classpath
+.project
 target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 release.properties
+

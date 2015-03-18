@@ -1,0 +1,573 @@
+/*
+ * Copyright (C) 2015 The Pennsylvania State University and the University of Wisconsin
+ * Systems and Internet Infrastructure Security Laboratory
+ *
+ * Author: Damien Octeau
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+class android.content.Intent {
+  String action(1);
+  String categories;
+  String package(1);
+  String clazz(1);
+  int flags;
+  String extras;
+  String dataType;
+
+  /* URI parts.*/
+  String scheme(1);
+  String ssp(1);
+  String fragment(1);
+  String uri(1);
+  String path(1);
+  String uriQuery(1);
+  String authority(1);
+  String appendedPaths;
+  String appendedQueries;
+
+
+  copy <android.content.Intent: void <init>(android.content.Intent)> {
+    0;
+  }
+  mod <android.content.Intent: void <init>()> {
+    /* Even though this does not record field values, we still need to keep 
+     * track of an initialized but empty Intent value.*/
+  }
+  argument replaceAction0 = 0: replace action;
+  mod <android.content.Intent: void <init>(java.lang.String)> {
+    argument replaceAction0;
+  }
+  argument scheme1 = 1: replace scheme, type android.net.Uri:scheme;
+  argument ssp1 = 1: replace ssp, type android.net.Uri:ssp;
+  argument fragment1 = 1: replace fragment, type android.net.Uri:fragment;
+  argument uri1 = 1: replace uri, type android.net.Uri:uri;
+  argument path1 = 1: replace path, type android.net.Uri:path;
+  argument uriQuery1 = 1: replace uriQuery, type android.net.Uri:uriQuery;
+  argument authority1 = 1: replace authority, type android.net.Uri:authority;
+  argument appendedPaths1 = 1: replace appendedPaths, type android.net.Uri:appendedPaths;
+  argument appendedQueries1 = 1: replace appendedQueries, type android.net.Uri:appendedQueries;
+  mod <android.content.Intent: void <init>(java.lang.String,android.net.Uri)> {
+    argument replaceAction0;
+    argument scheme1;
+    argument ssp1;
+    argument fragment1;
+    argument uri1;
+    argument path1;
+    argument uriQuery1;
+    argument authority1;
+    argument appendedPaths1;
+    argument appendedQueries1;
+  }
+  mod <android.content.Intent: void <init>(android.content.Context,java.lang.Class)> {
+    0: replace package, type context;
+    1: replace clazz, type Class;
+  }
+  mod <android.content.Intent: void <init>(java.lang.String,android.net.Uri,android.content.Context,java.lang.Class)> {
+    argument replaceAction0;
+    argument scheme1;
+    argument ssp1;
+    argument fragment1;
+    argument uri1;
+    argument path1;
+    argument uriQuery1;
+    argument authority1;
+    argument appendedPaths1;
+    argument appendedQueries1;
+    2: replace package, type context;
+    3: replace clazz, type Class;
+  }
+  mod <android.content.Intent: android.content.Intent addCategory(java.lang.String)> {
+    0: add categories;
+  }
+  mod <android.content.Intent: android.content.Intent addFlags(int)> {
+    0: add flags;
+  }
+  mod <android.content.Intent: android.content.Intent fillIn(android.content.Intent,int)> {
+    clear action;
+    clear categories;
+    replace package "(.*)";
+    replace clazz "(.*)";
+    clear flags;
+    clear extras;
+    clear dataType;
+    clear scheme;
+    clear ssp;
+    clear fragment;
+    clear uri;
+    clear path;
+    clear uriQuery;
+    clear authority;
+    clear appendedPaths;
+    clear appendedQueries;
+  }
+  argument addExtra = 0: add extras;
+  mod <android.content.Intent: android.content.Intent putCharSequenceArrayListExtra(java.lang.String,java.util.ArrayList)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,double[])> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,int)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.CharSequence)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,char)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,android.os.Bundle)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,android.os.Parcelable[])> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,java.io.Serializable)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,int[])> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,float)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,byte[])> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,long[])> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,android.os.Parcelable)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,float[])> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,long)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String[])> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,boolean)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,boolean[])> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,short)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,double)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,short[])> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.String)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,byte)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,char[])> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtra(java.lang.String,java.lang.CharSequence[])> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putExtras(android.content.Intent)> {
+    0: add extras, type android.content.Intent:extras;
+  }
+  mod <android.content.Intent: android.content.Intent putExtras(android.os.Bundle)> {
+    0: add extras, type android.os.Bundle:extras;
+  }
+  mod <android.content.Intent: android.content.Intent putIntegerArrayListExtra(java.lang.String,java.lang.ArrayList)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putParcelableArrayListExtra(java.lang.String,java.lang.ArrayList)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: android.content.Intent putStringArrayListExtra(java.lang.String,java.lang.ArrayList)> {
+    argument addExtra;
+  }
+  mod <android.content.Intent: void removeCategory(java.lang.String)> {
+    0: remove categories;
+  }
+  mod <android.content.Intent: void removeExtra(java.lang.String)> {
+    0: remove extras;
+  }
+  mod <android.content.Intent: android.content.Intent replaceExtras(android.content.Intent)> {
+    0: replace extras, type android.content.Intent:extras;
+  }
+  mod <android.content.Intent: android.content.Intent replaceExtras(android.os.Bundle)> {
+    0: replace extras, type android.os.Bundle:extras;
+  }
+  mod <android.content.Intent: android.content.Intent setAction(java.lang.String)> {
+    argument replaceAction0;
+  }
+  argument replacePackage = 0: replace package, type context;
+  mod <android.content.Intent: android.content.Intent setClass(android.content.Context,java.lang.Class)> {
+    argument replacePackage;
+    1: replace clazz, type Class;
+  }
+  argument replaceClass1 = 1: replace clazz;
+  mod <android.content.Intent: android.content.Intent setClassName(android.content.Context,java.lang.String)> {
+    argument replacePackage;
+    argument replaceClass1;
+  }
+  mod <android.content.Intent: android.content.Intent setClassName(java.lang.String,java.lang.String)> {
+    0: replace package;
+    argument replaceClass1;
+  }
+  mod <android.content.Intent: android.content.Intent setComponent(android.content.ComponentName)> {
+    0: replace package, type android.content.ComponentName:package;
+    0: replace clazz, type android.content.ComponentName:clazz;
+  }
+  argument scheme0 = 0: replace scheme, type android.net.Uri:scheme;
+  argument ssp0 = 0: replace ssp, type android.net.Uri:ssp;
+  argument fragment0 = 0: replace fragment, type android.net.Uri:fragment;
+  argument uri0 = 0: replace uri, type android.net.Uri:uri;
+  argument path0 = 0: replace path, type android.net.Uri:path;
+  argument uriQuery0 = 0: replace uriQuery, type android.net.Uri:uriQuery;
+  argument authority0 = 0: replace authority, type android.net.Uri:authority;
+  argument appendedPaths0 = 0: replace appendedPaths, type android.net.Uri:appendedPaths;
+  argument appendedQueries0 = 0: replace appendedQueries, type android.net.Uri:appendedQueries;
+  
+  mod <android.content.Intent: android.content.Intent setData(android.net.Uri)> {
+    argument scheme0;
+    argument ssp0;
+    argument fragment0;
+    argument uri0;
+    argument path0;
+    argument uriQuery0;
+    argument authority0;
+    argument appendedPaths0;
+    argument appendedQueries0;
+    clear dataType;
+  }
+  argument type1 = 1: replace dataType;
+  mod <android.content.Intent: android.content.Intent setDataAndType(android.net.Uri,java.lang.String)> {
+    argument scheme0;
+    argument ssp0;
+    argument fragment0;
+    argument uri0;
+    argument path0;
+    argument uriQuery0;
+    argument authority0;
+    argument appendedPaths0;
+    argument appendedQueries0;
+    argument type1;
+  }
+  mod <android.content.Intent: android.content.Intent setDataAndTypeAndNormalize(android.net.Uri,java.lang.String)> {
+    argument scheme0;
+    argument ssp0;
+    argument fragment0;
+    argument uri0;
+    argument path0;
+    argument uriQuery0;
+    argument authority0;
+    argument appendedPaths0;
+    argument appendedQueries0;
+    argument type1;
+  }
+  mod <android.content.Intent: android.content.Intent setFlags(int)> {
+    0: replace flags;
+  }
+  mod <android.content.Intent: android.content.Intent setPackage(java.lang.String)> {
+    0: replace package;
+  }
+  argument type0 = 0: replace dataType;
+  argument clearScheme = clear scheme;
+  argument clearSsp = clear ssp;
+  argument clearFragment = clear fragment;
+  argument clearUri = clear uri;
+  argument clearPath = clear path;
+  argument clearUriQuery = clear uriQuery;
+  argument clearAuthority = clear authority;
+  argument clearAppendedPaths = clear appendedPaths;
+  argument clearAppendedQueries = clear appendedQueries;
+  mod <android.content.Intent: android.content.Intent setType(java.lang.String)> {
+    argument type0;
+    argument clearScheme;
+    argument clearSsp;
+    argument clearFragment;
+    argument clearUri;
+    argument clearPath;
+    argument clearUriQuery;
+    argument clearAuthority;
+    argument clearAppendedPaths;
+    argument clearAppendedQueries;
+  }
+  mod <android.content.Intent: android.content.Intent setTypeAndNormalize(java.lang.String)> {
+    argument type0;
+    argument clearScheme;
+    argument clearSsp;
+    argument clearFragment;
+    argument clearUri;
+    argument clearPath;
+    argument clearUriQuery;
+    argument clearAuthority;
+    argument clearAppendedPaths;
+    argument clearAppendedQueries;
+  }
+
+  mod gen <android.content.pm.PackageManager: android.content.Intent getLaunchIntentForPackage(java.lang.String)> {
+    replace action "android.intent.action.MAIN";
+    add categories ("android.intent.category.INFO", "android.intent.category.LAUNCHER");
+    0: replace package;
+    add flags 268435456;
+    /* We don't include the class name because it is resolved at runtime using the fields above.*/
+  }
+  mod gen <android.content.Intent: android.content.Intent createChooser(android.content.Intent,java.lang.CharSequence)> {
+    replace action "android.intent.action.CHOOSER";
+    add extras "android.intent.extra.INTENT";
+    add extras ("android.intent.extra.INTENT", "android.intent.extra.TITLE");
+    add flags (0, 1, 2);
+    add flags (0, 1, 2);
+    add flags 0;
+  }
+  mod gen <android.content.Intent: android.content.Intent makeMainActivity(android.content.ComponentName)> {
+    0: replace package, type android.content.ComponentName:package;
+    0: replace clazz, type android.content.ComponentName:clazz;
+    replace action "android.intent.action.MAIN";
+    replace categories "android.intent.category.LAUNCHER";
+  }
+  super activity = android.app.Activity;
+  mod gen activity : android.content.Intent getIntent() {
+    replace action "<INTENT>";
+    replace categories "<INTENT>";
+    replace extras "<INTENT>";
+  }
+
+  source <android.content.Intent: java.lang.String getType()> {
+    dataType;
+  }
+  source <android.content.Intent: java.lang.String getAction()> {
+    action;
+  }
+  source <android.content.Intent: java.util.Set getCategories()> {
+    categories;
+  }
+  source <android.content.Intent: android.content.ComponentName getComponentName()> {
+    package;
+    clazz;
+  }
+  source <android.content.Intent: android.net.Uri getData()> {
+    scheme;
+    ssp;
+    fragment;
+    uri;
+    path;
+    uriQuery;
+    authority;
+    appendedPaths;
+    appendedQueries;
+  }
+  source <android.content.Intent: android.os.Bundle getExtras()> {
+    extras;
+  }
+  source <android.content.Intent: int getFlags()> {
+    flags;
+  }
+  source <android.content.Intent: java.lang.String getPackage()> {
+    package;
+  }
+  source <android.content.Intent: java.lang.String getScheme()> {
+    scheme;
+  }
+  source <android.content.Intent: java.lang.String toString()> {
+    action;
+  }
+
+  argument intentArrayActivity = 0: type android.content.Intent[], prop "valueType": "activity";
+/*  super activity = android.app.Activity;*/
+/*  super receiver = android.content.BroadcastReceiver;*/
+/*  super service = android.app.Service;*/
+/*  super provider = android.content.ContentProvider;*/
+  super context = android.content.Context;
+  query context : void startActivities(android.content.Intent[],android.os.Bundle) {
+    argument intentArrayActivity;
+  }
+  query context : void startActivities(android.content.Intent[]) {
+    argument intentArrayActivity;
+  }
+  argument intentService0 = 0: type android.content.Intent, prop "valueType": "service";
+  query context : boolean bindService(android.content.Intent,android.content.ServiceConnection,int) {
+    argument intentService0;
+  }
+  argument intentReceiver0 = 0: type android.content.Intent, prop "valueType": "receiver";
+  query context : void sendBroadcast(android.content.Intent) {
+    argument intentReceiver0;
+  }
+  argument stringPermission1 = 1: type String, prop "valueType": "permission";
+  query context : void sendBroadcast(android.content.Intent,java.lang.String) {
+    argument intentReceiver0;
+    argument stringPermission1;
+  }
+  query context : void sendBroadcastAsUser(android.content.Intent,android.os.UserHandle) {
+    argument intentReceiver0;
+  }
+  argument stringPermission2 = 2: type String, prop "valueType": "permission";
+  query context : void sendBroadcastAsUser(android.content.Intent,android.os.UserHandle,java.lang.String) {
+    argument intentReceiver0;
+    argument stringPermission2;
+  }
+  query context : void sendOrderedBroadcast(android.content.Intent,java.lang.String,android.content.BroadcastReceiver,android.os.Handler,int,java.lang.String,android.os.Bundle) {
+    argument intentReceiver0;
+    argument stringPermission1;
+  }
+  query context : void sendOrderedBroadcast(android.content.Intent,java.lang.String) {
+    argument intentReceiver0;
+    argument stringPermission1;
+  }
+  query context : void sendOrderedBroadcastAsUser(android.content.Intent,android.os.UserHandle,java.lang.String,android.content.BroadcastReceiver,android.os.Handler,int,java.lang.String,android.os.Bundle) {
+    argument intentReceiver0;
+    argument stringPermission2;
+  }
+  query context : void sendStickyBroadcast(android.content.Intent) {
+    argument intentReceiver0;
+  }
+  query context : void sendStickyBroadcastAsUser(android.content.Intent,android.os.UserHandle) {
+    argument intentReceiver0;
+  }
+  query context : void sendStickyOrderedBroadcast(android.content.Intent,android.content.BroadcastReceiver,android.os.Handler,int,java.lang.String,android.os.Bundle) {
+    argument intentReceiver0;
+  }
+  query context : void sendStickyOrderedBroadcastAsUser(android.content.Intent,android.os.UserHandle,android.content.BroadcastReceiver,android.os.Handler,int,java.lang.String,android.os.Bundle) {
+    argument intentReceiver0;
+  }
+  argument intentActivity0 = 0: type android.content.Intent, prop "valueType": "activity";
+  argument intentService0 = 0: type android.content.Intent, prop "valueType": "service";
+  query context : void startActivity(android.content.Intent) {
+    argument intentActivity0;
+  }
+  query context : void startActivity(android.content.Intent,android.os.Bundle) {
+    argument intentActivity0;
+  }
+  query context : void startActivityForResult(android.content.Intent,int) {
+    argument intentActivity0;
+  }
+  query context : void startActivityForResult(android.content.Intent,int,android.os.Bundle) {
+    argument intentActivity0;
+  }
+  argument intentActivity1 = 1: type android.content.Intent, prop "valueType": "activity";
+  query context : void startActivityFromChild(android.app.Activity,android.content.Intent,int,android.os.Bundle) {
+    argument intentActivity1;
+  }
+  query context : void startActivityFromChild(android.app.Activity,android.content.Intent,int) {
+    argument intentActivity1;
+  }
+  query context : void startActivityFromFragment(android.app.Fragment,android.content.Intent,int,android.os.Bundle) {
+    argument intentActivity1;
+  }
+  query context : void startActivityFromFragment(android.app.Fragment,android.content.Intent,int) {
+    argument intentActivity1;
+  }
+  query context : void startActivityIfNeeded(android.content.Intent,int,android.os.Bundle) {
+    argument intentActivity0;
+  }
+  query context : void startActivityIfNeeded(android.content.Intent,int) {
+    argument intentActivity0;
+  }
+  query context : android.content.ComponentName startService(android.content.Intent) {
+    argument intentService0;
+  }
+  query context : android.content.ComponentName bindService(android.content.Intent,android.content.ServiceConnection,int) {
+    argument intentService0;
+  }
+  exclude android.app.Activity;
+
+  argument stringExtra0 = 0: type String, prop "valueType": "componentExtra";
+  query <android.content.Intent: boolean[] getBooleanArrayExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: boolean getBooleanExtra(java.lang.String,boolean)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: android.os.Bundle getBundleExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: byte[] getByteArrayExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: byte getByteExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: char[] getCharArrayExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: char getCharExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: java.lang.CharSequence getCharSequenceExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: double[] getDoubleArrayExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: double getDoubleExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: float[] getFloatArrayExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: float getFloatExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: int[] getIntArrayExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: int getIntExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: java.util.ArrayList getIntegerArrayListExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: long[] getLongArrayExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: long getLongExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: android.os.Parcelable[] getParcelableArrayExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: java.util.ArrayList getParcelableArrayListExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: android.os.Parcelable getParcelableExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: java.io.Serializable getSerializableExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: short[] getShortArrayExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: short getShortExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: java.lang.String[] getStringArrayExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: java.util.ArrayList getStringArrayListExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+  query <android.content.Intent: java.lang.String getStringExtra(java.lang.String)> {
+    argument stringExtra0;
+  }
+}
