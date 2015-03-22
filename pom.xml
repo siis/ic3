@@ -86,6 +86,7 @@
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.3.2</version>
         <executions>
+          <!-- Compile the ICC model to a single, binary file. -->
           <execution>
             <phase>compile</phase>
             <goals>
@@ -101,6 +102,7 @@
           </execution>
         </executions>
         <dependencies>
+          <!-- Enable logging for the model compilation. -->
           <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
@@ -111,16 +113,28 @@
       </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.5.3</version>
         <configuration>
           <archive>
             <manifest>
-              <mainClass>icc.Main</mainClass>
+              <mainClass>edu.psu.cse.siis.ic3.Main</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
+          <appendAssemblyId>false</appendAssemblyId>
         </configuration>
+        <executions>
+          <execution>
+            <!-- Automatically package everything during install of deploy phases. -->
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
 

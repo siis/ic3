@@ -28,9 +28,9 @@ import edu.psu.cse.siis.coal.CommandLineParser;
  * Command line parser for IC3.
  */
 public class Ic3CommandLineParser extends CommandLineParser<Ic3CommandLineArguments> {
-  private static final String COPYRIGHT = "Copyright 2015 The Pennsylvania State University\n"
-      + "Systems and Internet Infrastructure Security Laboratory\n"
-      + "Copyright 2015 The University of Wisconsin\n";
+  private static final String COPYRIGHT =
+      "Copyright (C) 2015 The Pennsylvania State University and the University of Wisconsin\n"
+          + "Systems and Internet Infrastructure Security Laboratory\n";
 
   @SuppressWarnings("static-access")
   @Override
@@ -40,16 +40,12 @@ public class Ic3CommandLineParser extends CommandLineParser<Ic3CommandLineArgume
         .withArgName(".apk or manifest").isRequired().create("apkormanifest"));
     options.addOption(OptionBuilder.withDescription("The application name.").hasArg()
         .withArgName("app name").create("appname"));
-    options.addOption(OptionBuilder.withDescription("Output directory for ICC study.").hasArg()
-        .withArgName("ICC study directory").create("iccstudy"));
     options.addOption(OptionBuilder.withDescription("Store entry points to database.")
         .hasOptionalArg().withArgName("DB properties file").create("db"));
     options.addOption(OptionBuilder.withDescription("Use SSH to connect to the database.")
         .hasOptionalArg().withArgName("SSH properties file").create("ssh"));
     options.addOption(OptionBuilder.withDescription("Local DB port to connect to.").hasArg()
         .withType(Number.class).withArgName("local DB port").create("localport"));
-    options.addOption(OptionBuilder.withDescription("Specify a sample name.").hasArg()
-        .withArgName("sample name").create("sample"));
     options.addOption("computecomponents", false,
         "Compute which components each exit point belongs to.");
   }
@@ -61,9 +57,8 @@ public class Ic3CommandLineParser extends CommandLineParser<Ic3CommandLineArgume
     formatter.printHelp("ic3 -input <Android directory> -classpath <classpath> "
         + "-output <output directory> -apk <path to application .apk> [-model "
         + "<model directory>] [-cmodel <compiled model path>] [-appName <app name>] "
-        + "[-objectsensitive] [-computecomponents] [-icc-study <ICC study output directory>] "
-        + "[-db <path to DB properties file>] [-ssh <path to SSH properties file>] "
-        + "[-localport <DB local port>] [-binary] [-sample <sample name>] [-skipnonmodeledtypes]",
+        + "[-computecomponents] [-db <path to DB properties file>] "
+        + "[-ssh <path to SSH properties file>] [-localport <DB local port>] [-modeledtypesonly]",
         options);
   }
 }
