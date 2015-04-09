@@ -1,6 +1,5 @@
 package edu.psu.cse.siis.ic3;
 
-
 import java.io.IOException;
 import java.io.Writer;
 import java.sql.SQLException;
@@ -16,6 +15,12 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import soot.Scene;
+import soot.SootMethod;
+import soot.Type;
+import soot.Unit;
+import soot.jimple.InvokeExpr;
+import soot.jimple.Stmt;
 import edu.psu.cse.siis.coal.AnalysisParameters;
 import edu.psu.cse.siis.coal.Constants;
 import edu.psu.cse.siis.coal.Model;
@@ -30,21 +35,11 @@ import edu.psu.cse.siis.coal.values.BottomPropagationValue;
 import edu.psu.cse.siis.coal.values.PathValue;
 import edu.psu.cse.siis.coal.values.PropagationValue;
 import edu.psu.cse.siis.coal.values.TopPropagationValue;
-import edu.psu.cse.siis.ic3.DataAuthority;
-import edu.psu.cse.siis.ic3.Ic3Result;
-import edu.psu.cse.siis.ic3.Timers;
 import edu.psu.cse.siis.ic3.db.DbConnection;
 import edu.psu.cse.siis.ic3.db.SQLConnection;
 import edu.psu.cse.siis.ic3.manifest.ManifestComponent;
 import edu.psu.cse.siis.ic3.manifest.ManifestData;
 import edu.psu.cse.siis.ic3.manifest.ManifestIntentFilter;
-
-import soot.Scene;
-import soot.SootMethod;
-import soot.Type;
-import soot.Unit;
-import soot.jimple.InvokeExpr;
-import soot.jimple.Stmt;
 
 public class ResultProcessor {
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -138,13 +133,13 @@ public class ResultProcessor {
         if (valueMap.containsKey("activity")) {
           DbConnection.insertIntentAtExitPoint(className, methodSignature, unitId,
               (BasePropagationValue) valueMap.get("activity"),
-              edu.psu.cse.siis.ic3.db.Constants.ComponentShortType.ACTIVITY, null, null, entryPointMap.get(method),
-              componentToIdMap);
+              edu.psu.cse.siis.ic3.db.Constants.ComponentShortType.ACTIVITY, null, null,
+              entryPointMap.get(method), componentToIdMap);
         } else if (valueMap.containsKey("service")) {
           DbConnection.insertIntentAtExitPoint(className, methodSignature, unitId,
               (BasePropagationValue) valueMap.get("service"),
-              edu.psu.cse.siis.ic3.db.Constants.ComponentShortType.SERVICE, null, null, entryPointMap.get(method),
-              componentToIdMap);
+              edu.psu.cse.siis.ic3.db.Constants.ComponentShortType.SERVICE, null, null,
+              entryPointMap.get(method), componentToIdMap);
         } else if (valueMap.containsKey("receiver")) {
           DbConnection.insertIntentAtExitPoint(className, methodSignature, unitId,
               (BasePropagationValue) valueMap.get("receiver"),
@@ -158,29 +153,29 @@ public class ResultProcessor {
         } else if (valueMap.containsKey("provider")) {
           DbConnection.insertIntentAtExitPoint(className, methodSignature, unitId,
               (BasePropagationValue) valueMap.get("provider"),
-              edu.psu.cse.siis.ic3.db.Constants.ComponentShortType.PROVIDER, null, null, entryPointMap.get(method),
-              componentToIdMap);
+              edu.psu.cse.siis.ic3.db.Constants.ComponentShortType.PROVIDER, null, null,
+              entryPointMap.get(method), componentToIdMap);
         } else if (valueMap.containsKey("authority")) {
           DbConnection.insertIntentAtExitPoint(className, methodSignature, unitId,
               getUriValueForAuthorities((Set<String>) valueMap.get("authority")),
-              edu.psu.cse.siis.ic3.db.Constants.ComponentShortType.PROVIDER, null, null, entryPointMap.get(method),
-              componentToIdMap);
+              edu.psu.cse.siis.ic3.db.Constants.ComponentShortType.PROVIDER, null, null,
+              entryPointMap.get(method), componentToIdMap);
         } else if (valueMap.containsKey("pendingIntent")) {
-          BasePropagationValue baseCollectingValue =
+          BasePropagationValue basePropagationValue =
               (BasePropagationValue) valueMap.get("pendingIntent");
           String targetType =
-              baseCollectingValue instanceof PropagationValue ? (String) ((PropagationValue) baseCollectingValue)
+              basePropagationValue instanceof PropagationValue ? (String) ((PropagationValue) basePropagationValue)
                   .getValuesForField("targetType").iterator().next().getValues().iterator().next()
                   : null;
           Set<String> permissions = (Set<String>) valueMap.get("permission");
           if (targetType != null) {
             DbConnection.insertIntentAtExitPoint(className, methodSignature, unitId,
-                baseCollectingValue, targetType, permissions, null, entryPointMap.get(method),
+                basePropagationValue, targetType, permissions, null, entryPointMap.get(method),
                 componentToIdMap);
           } else {
             for (String target : Arrays.asList("a", "r", "s")) {
               DbConnection.insertIntentAtExitPoint(className, methodSignature, unitId,
-                  baseCollectingValue, target, permissions, null, entryPointMap.get(method),
+                  basePropagationValue, target, permissions, null, entryPointMap.get(method),
                   componentToIdMap);
             }
           }
@@ -215,9 +210,9 @@ public class ResultProcessor {
       manifestIntentFilters = null;
     } else if (intentFilters instanceof PropagationValue) {
       missingIntentFilters = null;
-      PropagationValue collectingValue = (PropagationValue) intentFilters;
+      PropagationValue propagationValue = (PropagationValue) intentFilters;
       manifestIntentFilters = new HashSet<>();
-      for (PathValue branchValue : collectingValue.getPathValues()) {
+      for (PathValue branchValue : propagationValue.getPathValues()) {
         Integer filterPriority = null;
         FieldValue priorityFieldValue = branchValue.getFieldValue("priority");
         if (priorityFieldValue != null) {
@@ -232,8 +227,8 @@ public class ResultProcessor {
     }
 
     ManifestComponent manifestComponent =
-        new ManifestComponent(edu.psu.cse.siis.ic3.db.Constants.ComponentShortType.RECEIVER, receiverType, true,
-            true, permission, null, missingIntentFilters);
+        new ManifestComponent(edu.psu.cse.siis.ic3.db.Constants.ComponentShortType.RECEIVER,
+            receiverType, true, true, permission, null, missingIntentFilters);
     manifestComponent.setIntentFilters(manifestIntentFilters);
     SQLConnection.insertIntentFilters(Collections.singletonList(manifestComponent));
   }

@@ -40,17 +40,17 @@ public class DbConnection extends SQLConnection {
       int instruction, BasePropagationValue intentValue, String exit_kind,
       Set<String> intentPermissions, Integer missingIntents, Set<String> exitPointComponents,
       Map<String, Integer> componentToIdMap) throws SQLException {
-    PropagationValue collectingValue = null;
+    PropagationValue propagationValue = null;
     if (intentValue == null || intentValue instanceof TopPropagationValue
         || intentValue instanceof BottomPropagationValue) {
       missingIntents = 0;
     } else if (intentValue instanceof PropagationValue) {
-      collectingValue = (PropagationValue) intentValue;
-      if (collectingValue.getPathValues() == null || collectingValue.getPathValues().size() == 0) {
+      propagationValue = (PropagationValue) intentValue;
+      if (propagationValue.getPathValues() == null || propagationValue.getPathValues().size() == 0) {
         missingIntents = 0;
       }
     } else {
-      throw new RuntimeException("Unknown CollectingValue type: " + intentValue.getClass());
+      throw new RuntimeException("Unknown PropagationValue type: " + intentValue.getClass());
     }
 
     int exitPointId = insertExitPoint(className, method, instruction, exit_kind, missingIntents);
@@ -68,7 +68,7 @@ public class DbConnection extends SQLConnection {
     // } else {
 
     if (missingIntents == null) {
-      Set<PathValue> singleIntentValues = collectingValue.getPathValues();
+      Set<PathValue> singleIntentValues = propagationValue.getPathValues();
       if (singleIntentValues != null) {
         for (PathValue singleIntentValue : singleIntentValues) {
           if (exit_kind.equals(Constants.ComponentShortType.PROVIDER)) {

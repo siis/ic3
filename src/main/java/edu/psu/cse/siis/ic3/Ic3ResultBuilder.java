@@ -107,29 +107,29 @@ public class Ic3ResultBuilder implements ResultBuilder {
             for (Argument argument : arguments) {
               if (Model.v().isModeledType(argument.getType())) {
                 int argnum = argument.getArgnum()[0];
-                BasePropagationValue baseCollectingValue;
+                BasePropagationValue basePropagationValue;
                 InvokeExpr invokeExpr = stmt.getInvokeExpr();
                 if (argnum >= 0) {
-                  baseCollectingValue = solver.resultAt(unit, invokeExpr.getArg(argnum));
+                  basePropagationValue = solver.resultAt(unit, invokeExpr.getArg(argnum));
                 } else if (invokeExpr instanceof InstanceInvokeExpr && argnum == -1) {
                   InstanceInvokeExpr instanceInvokeExpr = (InstanceInvokeExpr) invokeExpr;
-                  baseCollectingValue = solver.resultAt(stmt, instanceInvokeExpr.getBase());
+                  basePropagationValue = solver.resultAt(stmt, instanceInvokeExpr.getBase());
                 } else {
                   throw new RuntimeException("Unexpected argument number " + argnum
                       + " for invoke expression " + invokeExpr);
                 }
-                if (baseCollectingValue instanceof PropagationValue) {
-                  PropagationValue collectingValue = (PropagationValue) baseCollectingValue;
+                if (basePropagationValue instanceof PropagationValue) {
+                  PropagationValue propagationValue = (PropagationValue) basePropagationValue;
 
                   PropagationTimers.v().resultGeneration.end();
                   PropagationTimers.v().valueComposition.start();
-                  collectingValue.makeFinalValue(solver);
+                  propagationValue.makeFinalValue(solver);
                   PropagationTimers.v().valueComposition.end();
                   PropagationTimers.v().resultGeneration.start();
 
-                  result.addResult(unit, argument.getArgnum()[0], collectingValue);
+                  result.addResult(unit, argument.getArgnum()[0], propagationValue);
                 } else {
-                  result.addResult(unit, argument.getArgnum()[0], baseCollectingValue);
+                  result.addResult(unit, argument.getArgnum()[0], basePropagationValue);
                 }
               } else if (foundModeledType || AnalysisParameters.v().inferNonModeledTypes()) {
                 // We infer non-modeled types if one of the arguments of the query is a modeled type
