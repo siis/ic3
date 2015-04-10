@@ -1,0 +1,104 @@
+syntax = "proto2";
+
+package edu.psu.cse.siis.ic3;
+
+enum AttributeKind {
+  ACTION = 0;
+  CATEGORY = 1;
+  PACKAGE = 2;
+  CLASS = 3;
+  TYPE = 4;
+  URI = 5;
+  SCHEME = 6;
+  EXTRA = 7;
+  AUTHORITY = 8;
+  HOST = 9;
+  PATH = 10;
+  PORT = 11;
+  SSP = 12;
+  QUERY = 13;
+  FLAG = 14;
+  PRIORITY = 15;
+}
+
+message Attribute {
+  required AttributeKind kind = 1;
+  repeated string value = 2;
+  repeated int32 int_value = 3;
+}
+
+message Application {
+  required string name = 1;
+  required uint32 version = 2;
+
+  message Permission {
+    required string name = 1;
+    enum Level {
+      NORMAL = 0;
+      DANGEROUS = 1;
+      SIGNATURE = 2;
+      SIGNATURE_OR_SYSTEM = 3;
+    }
+    required Level level = 2;
+  }
+
+  repeated Permission permissions = 3;
+  repeated string used_permissions = 4;
+
+  message Component {
+    required string name = 1;
+
+    enum ComponentKind {
+      ACTIVITY = 0;
+      SERVICE = 1;
+      RECEIVER = 2;
+      DYNAMIC_RECEIVER = 3;
+      PROVIDER = 4;
+    }
+
+    required ComponentKind kind = 2;
+    required bool exported = 3;
+    optional string permission = 4;
+    optional uint32 missing = 5;
+    repeated string extras = 6;
+    optional string alias_target = 7;
+    optional bool grant_uri_permissions = 8;
+    optional string read_permission = 9;
+    optional string write_permission = 10;
+    repeated string authorities = 11;
+
+    message IntentFilter {
+      repeated Attribute attributes = 1;
+    }
+
+    repeated IntentFilter intent_filters = 12;
+
+    message ExitPoint {
+      required string class_name = 1;
+      required string method = 2;
+      required uint32 instruction = 3;
+      required ComponentKind kind = 4;
+      optional uint32 missing = 5;
+
+      message Intent {
+        repeated Attribute attributes = 1;
+        optional string permission = 2;
+      }
+
+      repeated Intent intents = 6;
+
+      message Uri {
+        repeated Attribute attributes = 1;
+      }
+
+      repeated Uri uris = 7;
+    }
+
+    repeated ExitPoint exit_points = 13;
+  }
+
+  repeated Component components = 5;
+  optional int64 analysis_start = 6;
+  optional int64 analysis_end = 7;
+  optional string sample = 8;
+}

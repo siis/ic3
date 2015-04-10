@@ -74,6 +74,9 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
+  private Ic3Data.Application.Builder ic3Builder;
+  private Map<String, Ic3Data.Application.Component.Builder> componentNameToBuilderMap;
+
   protected String outputDir;
   protected String appName;
   protected String outputFile;
@@ -124,7 +127,14 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
 
     prepareManifestFile(commandLineArguments);
 
-    if (commandLineArguments.getDb() != null) {
+    if (commandLineArguments.getProtobufDestination() != null) {
+      ic3Builder = Ic3Data.Application.newBuilder();
+      ic3Builder.setAnalysisStart(startTime);
+      if (commandLineArguments.getSample() != null) {
+        ic3Builder.setSample(commandLineArguments.getSample());
+      }
+      componentNameToBuilderMap = ((ManifestPullParser) manifest).populateProtobuf(ic3Builder);
+    } else if (commandLineArguments.getDb() != null) {
       SQLConnection.init(commandLineArguments.getDb(), commandLineArguments.getSsh(),
           commandLineArguments.getDbLocalPort());
       componentToIdMap = ((ManifestPullParser) manifest).writeToDb(false);
@@ -206,7 +216,8 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
   }
 
   protected void prepareManifestFile(Ic3CommandLineArguments commandLineArguments) {
-    if (commandLineArguments.getDb() != null) {
+    if (commandLineArguments.getDb() != null
+        || commandLineArguments.getProtobufDestination() != null) {
       manifest = new ManifestPullParser();
       manifest.loadManifestFile(commandLineArguments.getManifest());
     }
@@ -235,14 +246,26 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
   @Override
   protected void processResults(Ic3CommandLineArguments commandLineArguments)
       throws FatalAnalysisException {
-    ResultProcessor resultProcessor = new ResultProcessor();
-    try {
-      resultProcessor.processResult(commandLineArguments.getDb() != null,
-          commandLineArguments.getAppName(), componentToIdMap, AnalysisParameters.v()
-              .getAnalysisClasses().size(), writer);
-    } catch (IOException | SQLException e) {
-      logger.error("Could not process analysis results", e);
-      throw new FatalAnalysisException();
+    if (commandLineArguments.getProtobufDestination() != null) {
+      ProtobufResultProcessor resultProcessor = new ProtobufResultProcessor();
+      try {
+        resultProcessor.processResult(appName, ic3Builder,
+            commandLineArguments.getProtobufDestination(), commandLineArguments.binary(),
+            componentNameToBuilderMap, AnalysisParameters.v().getAnalysisClasses().size(), writer);
+      } catch (IOException e) {
+        logger.error("Could not process analysis results", e);
+        throw new FatalAnalysisException();
+      }
+    } else {
+      ResultProcessor resultProcessor = new ResultProcessor();
+      try {
+        resultProcessor.processResult(commandLineArguments.getDb() != null,
+            commandLineArguments.getAppName(), componentToIdMap, AnalysisParameters.v()
+                .getAnalysisClasses().size(), writer);
+      } catch (IOException | SQLException e) {
+        logger.error("Could not process analysis results", e);
+        throw new FatalAnalysisException();
+      }
     }
   }
 

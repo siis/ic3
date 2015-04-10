@@ -127,12 +127,36 @@
         </configuration>
         <executions>
           <execution>
-            <!-- Automatically package everything during install of deploy phases. -->
+            <!-- Automatically package everything during install or deploy phases. -->
             <id>make-assembly</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.github.os72</groupId>
+        <artifactId>protoc-jar-maven-plugin</artifactId>
+        <version>2.5.0.1</version> <!-- for protobuf 2.5.0 -->
+        <!-- <version>2.4.1.1</version> --> <!-- for protobuf 2.4.1 -->
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <addSources>main</addSources>
+              <outputDirectory>target/generated-sources</outputDirectory>
+              <includeDirectories>
+                <include>src/main</include>
+              </includeDirectories>
+              <inputDirectories>
+                <include>src/main/protobuf</include>
+              </inputDirectories>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -207,6 +231,11 @@
       <groupId>infoflow-android</groupId>
       <artifactId>infoflow-android</artifactId>
       <version>20140213</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>2.5.0</version>
     </dependency>
   </dependencies>
 </project>

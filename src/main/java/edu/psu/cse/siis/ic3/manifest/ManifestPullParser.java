@@ -35,6 +35,13 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import soot.jimple.infoflow.android.manifest.ProcessManifest;
+import edu.psu.cse.siis.ic3.Ic3Data;
+import edu.psu.cse.siis.ic3.Ic3Data.Application.Builder;
+import edu.psu.cse.siis.ic3.Ic3Data.Application.Component;
+import edu.psu.cse.siis.ic3.Ic3Data.Application.Component.ComponentKind;
+import edu.psu.cse.siis.ic3.Ic3Data.Application.Component.IntentFilter;
+import edu.psu.cse.siis.ic3.Ic3Data.Attribute;
+import edu.psu.cse.siis.ic3.Ic3Data.AttributeKind;
 import edu.psu.cse.siis.ic3.db.Constants;
 import edu.psu.cse.siis.ic3.db.SQLConnection;
 import edu.psu.cse.siis.ic3.manifest.binary.AXmlResourceParser;
@@ -234,6 +241,135 @@ public class ManifestPullParser extends ProcessManifest {
 
   public boolean isComponent(String name) {
     return getEntryPointClasses().contains(name);
+  }
+
+  public Map<String, Ic3Data.Application.Component.Builder> populateProtobuf(Builder ic3Builder) {
+    ic3Builder.setName(getPackageName());
+    ic3Builder.setVersion(version);
+
+    for (Map.Entry<String, String> permission : permissions.entrySet()) {
+      Ic3Data.Application.Permission protobufPermission =
+          Ic3Data.Application.Permission.newBuilder().setName(permission.getKey())
+              .setLevel(stringToLevel(permission.getValue())).build();
+      ic3Builder.addPermissions(protobufPermission);
+    }
+
+    ic3Builder.addAllUsedPermissions(getPermissions());
+
+    Map<String, Ic3Data.Application.Component.Builder> componentNameToBuilderMap = new HashMap<>();
+
+    componentNameToBuilderMap.putAll(populateProtobufComponentBuilders(activities,
+        ComponentKind.ACTIVITY));
+    componentNameToBuilderMap.putAll(populateProtobufComponentBuilders(services,
+        ComponentKind.SERVICE));
+    componentNameToBuilderMap.putAll(populateProtobufComponentBuilders(receivers,
+        ComponentKind.RECEIVER));
+    componentNameToBuilderMap.putAll(populateProtobufComponentBuilders(providers,
+        ComponentKind.PROVIDER));
+
+    return componentNameToBuilderMap;
+  }
+
+  private Map<String, Component.Builder> populateProtobufComponentBuilders(
+      List<ManifestComponent> components, ComponentKind componentKind) {
+    Map<String, Component.Builder> componentNameToBuilderMap = new HashMap<>();
+
+    for (ManifestComponent manifestComponent : components) {
+      componentNameToBuilderMap.put(manifestComponent.getName(),
+          makeProtobufComponentBuilder(manifestComponent, componentKind));
+    }
+
+    return componentNameToBuilderMap;
+  }
+
+  public static Component.Builder makeProtobufComponentBuilder(ManifestComponent manifestComponent,
+      ComponentKind componentKind) {
+    Component.Builder componentBuilder = Component.newBuilder();
+    componentBuilder.setName(manifestComponent.getName());
+    componentBuilder.setKind(componentKind);
+
+    componentBuilder.setExported(manifestComponent.isExported());
+    if (manifestComponent.getPermission() != null) {
+      componentBuilder.setPermission(manifestComponent.getPermission());
+    }
+
+    if (manifestComponent.missingIntentFilters() != null) {
+      componentBuilder.setMissing(manifestComponent.missingIntentFilters());
+    }
+
+    if (manifestComponent.getIntentFilters() != null) {
+      for (ManifestIntentFilter filter : manifestComponent.getIntentFilters()) {
+        IntentFilter.Builder filterBuilder = IntentFilter.newBuilder();
+        if (filter.getPriority() != null) {
+          filterBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.PRIORITY)
+              .addIntValue(filter.getPriority()));
+        }
+        if (filter.getActions() != null) {
+          for (String action : filter.getActions()) {
+            filterBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.ACTION)
+                .addValue(action));
+          }
+        }
+        if (filter.getCategories() != null) {
+          filterBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.CATEGORY)
+              .addAllValue(filter.getCategories()));
+        }
+        if (filter.getData() != null) {
+          for (ManifestData data : filter.getData()) {
+            if (data.getHost() != null) {
+              filterBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.HOST)
+                  .addValue(data.getHost()));
+            }
+            if (data.getMimeType() != null) {
+              // String[] typeParts = data.getMimeType().split("/");
+              // String type;
+              // String subtype;
+              // if (typeParts.length == 2) {
+              // type = typeParts[0];
+              // subtype = typeParts[1];
+              // } else {
+              // type = Constants.ANY_STRING;
+              // subtype = Constants.ANY_STRING;
+              // }
+              filterBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.TYPE)
+                  .addValue(data.getMimeType()));
+              // filterBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.SUBTYPE)
+              // .addValue(subtype));
+            }
+            if (data.getPath() != null) {
+              filterBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.PATH)
+                  .addValue(data.getPath()));
+            }
+            if (data.getPort() != null) {
+              filterBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.PORT)
+                  .addValue(data.getPort()));
+            }
+            if (data.getScheme() != null) {
+              filterBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.SCHEME)
+                  .addValue(data.getScheme()));
+            }
+          }
+        }
+
+        componentBuilder.addIntentFilters(filterBuilder);
+      }
+    }
+
+    return componentBuilder;
+  }
+
+  private Ic3Data.Application.Permission.Level stringToLevel(String levelString) {
+    if (levelString.equalsIgnoreCase(Constants.PermissionLevel.NORMAL_SHORT)) {
+      return Ic3Data.Application.Permission.Level.NORMAL;
+    } else if (levelString.equalsIgnoreCase(Constants.PermissionLevel.DANGEROUS_SHORT)) {
+      return Ic3Data.Application.Permission.Level.DANGEROUS;
+    } else if (levelString.equalsIgnoreCase(Constants.PermissionLevel.SIGNATURE_SHORT)) {
+      return Ic3Data.Application.Permission.Level.SIGNATURE;
+    } else if (levelString.equalsIgnoreCase(Constants.PermissionLevel.SIGNATURE_OR_SYSTEM_SHORT)) {
+      return Ic3Data.Application.Permission.Level.SIGNATURE_OR_SYSTEM;
+    } else {
+      throw new RuntimeException("Unknown permission level: " + levelString);
+    }
   }
 
   @Override
