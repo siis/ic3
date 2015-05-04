@@ -104,8 +104,11 @@ public class ResultProcessor {
     if (logger.isInfoEnabled()) {
       logger.info(statistics);
     }
-    writer.write(statistics);
-    writer.close();
+
+    if (writer != null) {
+      writer.write(statistics);
+      writer.close();
+    }
   }
 
   @SuppressWarnings("unchecked")

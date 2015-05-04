@@ -30,7 +30,7 @@ import edu.psu.cse.siis.coal.CommandLineParser;
 public class Ic3CommandLineParser extends CommandLineParser<Ic3CommandLineArguments> {
   private static final String COPYRIGHT =
       "Copyright (C) 2015 The Pennsylvania State University and the University of Wisconsin\n"
-          + "Systems and Internet Infrastructure Security Laboratory";
+          + "Systems and Internet Infrastructure Security Laboratory\n";
 
   @SuppressWarnings("static-access")
   @Override
@@ -40,8 +40,6 @@ public class Ic3CommandLineParser extends CommandLineParser<Ic3CommandLineArgume
         .withArgName(".apk or manifest").isRequired().create("apkormanifest"));
     options.addOption(OptionBuilder.withDescription("The application name.").hasArg()
         .withArgName("app name").create("appname"));
-    options.addOption(OptionBuilder.withDescription("Output directory for ICC study.").hasArg()
-        .withArgName("ICC study directory").create("iccstudy"));
     options.addOption(OptionBuilder.withDescription("Store entry points to database.")
         .hasOptionalArg().withArgName("DB properties file").create("db"));
     options.addOption(OptionBuilder.withDescription("Use SSH to connect to the database.")
@@ -62,11 +60,9 @@ public class Ic3CommandLineParser extends CommandLineParser<Ic3CommandLineArgume
     HelpFormatter formatter = new HelpFormatter();
     System.out.println(COPYRIGHT);
     formatter.printHelp("ic3 -input <Android directory> -classpath <classpath> "
-        + "-output <output directory> -apk <path to application .apk> [-model "
-        + "<model directory>] [-cmodel <compiled model path>] [-appName <app name>] "
-        + "[-objectsensitive] [-computecomponents] [-icc-study <ICC study output directory>] "
+        + "-apk <path to application .apk> [-appName <app name>] [-computecomponents] "
         + "[-db <path to DB properties file>] [-ssh <path to SSH properties file>] "
-        + "[-localport <DB local port>] [-protobuf <destination path>] [-binary] "
-        + "[-sample <sample name>] [-skipnonmodeledtypes]", options);
+        + "[-localport <DB local port>] [-modeledtypesonly] [-output <output directory>] "
+        + "[-protobuf <destination path>] [-binary] [-sample <sample name>]", options);
   }
 }
