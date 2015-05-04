@@ -55,10 +55,8 @@ public class Ic3CommandLineParser extends CommandLineParser<Ic3CommandLineArgume
     HelpFormatter formatter = new HelpFormatter();
     System.out.println(COPYRIGHT);
     formatter.printHelp("ic3 -input <Android directory> -classpath <classpath> "
-        + "-output <output directory> -apk <path to application .apk> [-model "
-        + "<model directory>] [-cmodel <compiled model path>] [-appName <app name>] "
-        + "[-computecomponents] [-db <path to DB properties file>] "
-        + "[-ssh <path to SSH properties file>] [-localport <DB local port>] [-modeledtypesonly]",
-        options);
+        + "-apk <path to application .apk> [-appName <app name>] [-computecomponents] "
+        + "[-db <path to DB properties file>] [-ssh <path to SSH properties file>] "
+        + "[-localport <DB local port>] [-modeledtypesonly] [-output <output directory>]", options);
   }
 }

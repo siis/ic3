@@ -110,16 +110,17 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
   protected void initializeAnalysis(Ic3CommandLineArguments commandLineArguments)
       throws FatalAnalysisException {
     long startTime = System.currentTimeMillis() / 1000;
-    outputDir = commandLineArguments.getOutput() == null ? "./" : commandLineArguments.getOutput();
-    appName =
-        commandLineArguments.getAppName() == null ? "application" : commandLineArguments
-            .getAppName();
-    outputFile = String.format("%s/%s.csv", outputDir, appName);
+    outputDir = commandLineArguments.getOutput();
+    appName = commandLineArguments.getAppName();
 
-    try {
-      writer = new BufferedWriter(new FileWriter(outputFile, false));
-    } catch (IOException e1) {
-      logger.error("Could not open file " + outputFile, e1);
+    if (outputDir != null && appName != null) {
+      outputFile = String.format("%s/%s.csv", outputDir, appName);
+
+      try {
+        writer = new BufferedWriter(new FileWriter(outputFile, false));
+      } catch (IOException e1) {
+        logger.error("Could not open file " + outputFile, e1);
+      }
     }
 
     prepareManifestFile(commandLineArguments);
@@ -224,11 +225,13 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
   protected void handleFatalAnalysisException(Ic3CommandLineArguments commandLineArguments,
       FatalAnalysisException exception) {
     logger.error("Could not process application " + commandLineArguments.getAppName(), exception);
-    try {
-      writer.write(commandLineArguments.getInput() + " -1\n");
-      writer.close();
-    } catch (IOException e1) {
-      logger.error("Could not write to file after failure to process application", e1);
+    if (outputDir != null && appName != null) {
+      try {
+        writer.write(commandLineArguments.getInput() + " -1\n");
+        writer.close();
+      } catch (IOException e1) {
+        logger.error("Could not write to file after failure to process application", e1);
+      }
     }
   }
 
