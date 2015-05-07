@@ -1,0 +1,4 @@
+host=#your-host
+user=#your-user
+port=22
+identity=#path-to-your-private-key

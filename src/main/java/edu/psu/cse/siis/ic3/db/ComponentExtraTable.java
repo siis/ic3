@@ -22,7 +22,7 @@ import java.sql.SQLException;
 
 public class ComponentExtraTable extends OneIntOneStringTable {
   ComponentExtraTable() {
-    super("ComponentExtra", "component_id", "extra");
+    super("ComponentExtras", "component_id", "extra");
   }
 
   @Override

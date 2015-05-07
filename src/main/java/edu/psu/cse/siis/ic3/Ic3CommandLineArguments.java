@@ -32,7 +32,6 @@ public class Ic3CommandLineArguments extends CommandLineArguments {
   private static final String DEFAULT_COMPILED_MODEL_PATH = "/res/icc.cmodel";
 
   private String manifest;
-  private String appName;
   private String db;
   private String ssh;
   private String iccStudy;
@@ -49,15 +48,6 @@ public class Ic3CommandLineArguments extends CommandLineArguments {
    */
   public String getManifest() {
     return manifest;
-  }
-
-  /**
-   * Gets the name of the application being analyzed.
-   * 
-   * @return The name of the application.
-   */
-  public String getAppName() {
-    return appName;
   }
 
   /**
@@ -135,7 +125,6 @@ public class Ic3CommandLineArguments extends CommandLineArguments {
    */
   public void processCommandLineArguments() {
     manifest = getOptionValue("apkormanifest");
-    appName = getOptionValue("appname");
 
     if (getCompiledModel() == null && getModel() == null) {
       setCompiledModel(DEFAULT_COMPILED_MODEL_PATH);
