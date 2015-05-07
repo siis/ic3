@@ -38,8 +38,6 @@ public class Ic3CommandLineParser extends CommandLineParser<Ic3CommandLineArgume
     options.addOption(OptionBuilder
         .withDescription("Path to the manifest file or the .apk of the application.").hasArg()
         .withArgName(".apk or manifest").isRequired().create("apkormanifest"));
-    options.addOption(OptionBuilder.withDescription("The application name.").hasArg()
-        .withArgName("app name").create("appname"));
     options.addOption(OptionBuilder.withDescription("Store entry points to database.")
         .hasOptionalArg().withArgName("DB properties file").create("db"));
     options.addOption(OptionBuilder.withDescription("Use SSH to connect to the database.")
@@ -55,7 +53,7 @@ public class Ic3CommandLineParser extends CommandLineParser<Ic3CommandLineArgume
     HelpFormatter formatter = new HelpFormatter();
     System.out.println(COPYRIGHT);
     formatter.printHelp("ic3 -input <Android directory> -classpath <classpath> "
-        + "-apk <path to application .apk> [-appName <app name>] [-computecomponents] "
+        + "-apk <path to application .apk> [-computecomponents] "
         + "[-db <path to DB properties file>] [-ssh <path to SSH properties file>] "
         + "[-localport <DB local port>] [-modeledtypesonly] [-output <output directory>]", options);
   }

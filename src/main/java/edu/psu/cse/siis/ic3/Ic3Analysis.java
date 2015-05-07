@@ -75,8 +75,6 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   protected String outputDir;
-  protected String appName;
-  protected String outputFile;
   protected Writer writer;
   protected ProcessManifest manifest;
   protected Map<String, Integer> componentToIdMap;
@@ -91,8 +89,6 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
   @Override
   protected void registerArgumentValueAnalyses(Ic3CommandLineArguments commandLineArguments) {
     ArgumentValueManager.v().registerDefaultArgumentValueAnalyses();
-    ArgumentValueManager.v().registerArgumentValueAnalysis("context",
-        new ContextValueAnalysis(commandLineArguments.getAppName()));
     ArgumentValueManager.v().registerArgumentValueAnalysis("classType",
         new ClassTypeValueAnalysis());
     ArgumentValueManager.v().registerArgumentValueAnalysis("authority",
@@ -102,8 +98,6 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
 
   @Override
   protected void registerMethodReturnValueAnalyses(Ic3CommandLineArguments commandLineArguments) {
-    AndroidMethodReturnValueAnalyses.registerAndroidMethodReturnValueAnalyses(commandLineArguments
-        .getAppName());
   }
 
   @Override
@@ -111,17 +105,6 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
       throws FatalAnalysisException {
     long startTime = System.currentTimeMillis() / 1000;
     outputDir = commandLineArguments.getOutput();
-    appName = commandLineArguments.getAppName();
-
-    if (outputDir != null && appName != null) {
-      outputFile = String.format("%s/%s.csv", outputDir, appName);
-
-      try {
-        writer = new BufferedWriter(new FileWriter(outputFile, false));
-      } catch (IOException e1) {
-        logger.error("Could not open file " + outputFile, e1);
-      }
-    }
 
     prepareManifestFile(commandLineArguments);
 
@@ -135,6 +118,7 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
     setupApplication =
         new SetupApplication(commandLineArguments.getManifest(), commandLineArguments.getInput(),
             commandLineArguments.getClasspath());
+
     Map<String, Set<String>> callBackMethods;
 
     try {
@@ -148,6 +132,27 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
     Timers.v().mainGeneration.end();
 
     Timers.v().misc.start();
+
+    if (manifest == null) {
+      manifest = setupApplication.getManifest();
+    }
+
+    // Application package name is now known.
+    String appName = manifest.getPackageName();
+    ArgumentValueManager.v().registerArgumentValueAnalysis("context",
+        new ContextValueAnalysis(appName));
+    AndroidMethodReturnValueAnalyses.registerAndroidMethodReturnValueAnalyses(appName);
+
+    if (outputDir != null && appName != null) {
+      String outputFile = String.format("%s/%s.csv", outputDir, appName);
+
+      try {
+        writer = new BufferedWriter(new FileWriter(outputFile, false));
+      } catch (IOException e1) {
+        logger.error("Could not open file " + outputFile, e1);
+      }
+    }
+
     // reset Soot:
     soot.G.reset();
 
@@ -156,9 +161,6 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
     addSceneTransformer(entryPointMap);
 
     if (commandLineArguments.computeComponents()) {
-      if (manifest == null) {
-        manifest = setupApplication.getManifest();
-      }
       addEntryPointMappingSceneTransformer(manifest, callBackMethods, entryPointMap);
     }
 
@@ -224,9 +226,17 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
   @Override
   protected void handleFatalAnalysisException(Ic3CommandLineArguments commandLineArguments,
       FatalAnalysisException exception) {
-    logger.error("Could not process application " + commandLineArguments.getAppName(), exception);
-    if (outputDir != null && appName != null) {
+    String appName = manifest != null ? manifest.getPackageName() : "";
+    logger.error("Could not process application " + appName, exception);
+
+    if (outputDir != null && !appName.equals("")) {
       try {
+        if (writer == null) {
+          String outputFile = String.format("%s/%s.csv", outputDir, appName);
+
+          writer = new BufferedWriter(new FileWriter(outputFile, false));
+        }
+
         writer.write(commandLineArguments.getInput() + " -1\n");
         writer.close();
       } catch (IOException e1) {
@@ -241,8 +251,8 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
     ResultProcessor resultProcessor = new ResultProcessor();
     try {
       resultProcessor.processResult(commandLineArguments.getDb() != null,
-          commandLineArguments.getAppName(), componentToIdMap, AnalysisParameters.v()
-              .getAnalysisClasses().size(), writer);
+          manifest.getPackageName(), componentToIdMap, AnalysisParameters.v().getAnalysisClasses()
+              .size(), writer);
     } catch (IOException | SQLException e) {
       logger.error("Could not process analysis results", e);
       throw new FatalAnalysisException();

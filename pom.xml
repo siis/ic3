@@ -21,10 +21,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <name>IC3: Inter-Component Communication Analysis in Android</name>
   <groupId>edu.psu.cse.siis</groupId>
   <artifactId>ic3</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+
+  <name>IC3: Inter-Component Communication Analysis in Android</name>
+  <description>The IC3 tool for inferring Inter-Component Communication in Android</description>
   <url>http://siis.cse.psu.edu/ic3/</url>
 
   <organization>
@@ -61,17 +63,24 @@
     </license>
   </licenses>
 
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <excludes>
-          <exclude>**/*.model</exclude>
-        </excludes>
-        <filtering>false</filtering>
-      </resource>
-    </resources>
+  <scm>
+    <connection>scm:git:https://github.com/siis/ic3.git</connection>
+    <developerConnection>scm:git:git@github.com:siis/ic3.git</developerConnection>
+    <url>https://github.com/siis/ic3</url>
+  </scm>
 
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
+  <build>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -81,6 +90,7 @@
           <target>1.7</target>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -110,31 +120,6 @@
             <scope>runtime</scope>
           </dependency>
         </dependencies>
-      </plugin>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.5.3</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>edu.psu.cse.siis.ic3.Main</mainClass>
-            </manifest>
-          </archive>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <appendAssemblyId>false</appendAssemblyId>
-        </configuration>
-        <executions>
-          <execution>
-            <!-- Automatically package everything during install of deploy phases. -->
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
 
@@ -170,7 +155,137 @@
         </plugin>
       </plugins>
     </pluginManagement>
+
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>model/*.model</exclude>
+          <exclude>log4j.properties</exclude>
+          <exclude>android.jar</exclude>
+          <exclude>db/*</exclude>
+        </excludes>
+        <filtering>false</filtering>
+      </resource>
+    </resources>
   </build>
+
+  <profiles>
+    <profile>
+      <!-- Use mvn clean compile package -P standalone to generate standalone version with proper
+      logging. -->
+      <id>standalone</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+          <version>1.7.7</version>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <resources>
+          <resource>
+            <directory>src/main/resources</directory>
+            <includes>
+              <include>log4j.properties</include>
+            </includes>
+            <filtering>false</filtering>
+          </resource>
+        </resources>
+
+        <plugins>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.5.3</version>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>edu.psu.cse.siis.ic3.Main</mainClass>
+                </manifest>
+              </archive>
+              <descriptors>
+                <descriptor>src/assembly/jar.xml</descriptor>
+                <descriptor>src/assembly/bin.xml</descriptor>
+              </descriptors>
+            </configuration>
+            <executions>
+              <execution>
+                <!-- Automatically package everything during install or deploy phases. -->
+                <id>make-assembly</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9.1</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.3</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <dependencies>
     <dependency>
@@ -192,11 +307,12 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.7.7</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>edu.psu.cse.siis</groupId>
       <artifactId>coal</artifactId>
-      <version>0.1.7-SNAPSHOT</version>
+      <version>0.1.6</version>
     </dependency>
     <dependency>
       <groupId>infoflow</groupId>
