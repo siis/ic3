@@ -36,7 +36,7 @@ class android.content.IntentFilter {
   }
   mod <android.content.IntentFilter: void <init>(java.lang.String,java.lang.String)> {
     argument replaceActions;
-    1: replace dataType;
+    1: replaceAll dataType;
   }
   mod <android.content.IntentFilter: void addAction(java.lang.String)> {
     0: add actions;
@@ -62,7 +62,7 @@ class android.content.IntentFilter {
 
   mod gen <android.content.IntentFilter: android.content.IntentFilter create(java.lang.String,java.lang.String)> {
     0: add actions;
-    1: replace dataType;
+    1: replaceAll dataType;
   }
 
   source <android.content.IntentFilter: int getPriority()> {

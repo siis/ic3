@@ -349,8 +349,8 @@ class android.content.Intent {
   super activity = android.app.Activity;
   mod gen activity : android.content.Intent getIntent() {
     replace action "<INTENT>";
-    replaceAll categories "<INTENT>";
-    replace extras "<INTENT>";
+    add categories "<INTENT>";
+    add extras "<INTENT>";
   }
 
   source <android.content.Intent: java.lang.String getType()> {
