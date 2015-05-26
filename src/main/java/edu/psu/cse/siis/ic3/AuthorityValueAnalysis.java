@@ -37,10 +37,10 @@ public class AuthorityValueAnalysis implements ArgumentValueAnalysis {
   public Set<Object> computeArgumentValues(Argument argument, Unit callSite) {
     Argument argument0 = new Argument(argument);
     argument0.setArgnum(new int[] { argument.getArgnum()[0] });
-    argument0.setType(Constants.DefaultArgumentTypes.STRING);
+    argument0.setType(Constants.DefaultArgumentTypes.Scalar.STRING);
     Argument argument1 = new Argument(argument);
     argument1.setArgnum(new int[] { argument.getArgnum()[1] });
-    argument1.setType(Constants.DefaultArgumentTypes.STRING);
+    argument1.setType(Constants.DefaultArgumentTypes.Scalar.STRING);
 
     Set<Object> hosts = ArgumentValueManager.v().getArgumentValues(argument0, callSite);
     Set<Object> ports = ArgumentValueManager.v().getArgumentValues(argument1, callSite);

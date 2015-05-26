@@ -19,7 +19,7 @@
 
 
 class android.os.Bundle {
-  String extras;
+  Set<String> extras;
 
   copy <android.os.Bundle: void <init>(android.os.Bundle)> {
     0;
@@ -28,7 +28,7 @@ class android.os.Bundle {
     clear extras;
   }
   mod <android.os.Bundle: void putAll(android.os.Bundle)> {
-    0: add extras, type android.os.Bundle:extras;
+    0: addAll extras, type android.os.Bundle:extras;
   }
   argument addExtra = 0: add extras;
   mod <android.os.Bundle: void putBoolean(java.lang.String,boolean)> {

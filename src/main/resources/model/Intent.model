@@ -19,31 +19,31 @@
 
 
 class android.content.Intent {
-  String action(1);
-  String categories;
-  String package(1);
-  String clazz(1);
-  int flags;
-  String extras;
+  String action;
+  Set<String> categories;
+  String package;
+  String clazz;
+  Set<int> flags;
+  Set<String> extras;
   String dataType;
 
   /* URI parts.*/
-  String scheme(1);
-  String ssp(1);
-  String fragment(1);
-  String uri(1);
-  String path(1);
-  String uriQuery(1);
-  String authority(1);
-  String appendedPaths;
-  String appendedQueries;
+  String scheme;
+  String ssp;
+  String fragment;
+  String uri;
+  String path;
+  String uriQuery;
+  String authority;
+  Set<String> appendedPaths;
+  Set<String> appendedQueries;
 
 
   copy <android.content.Intent: void <init>(android.content.Intent)> {
     0;
   }
   mod <android.content.Intent: void <init>()> {
-    /* Even though this does not record field values, we still need to keep 
+    /* Even though this does not record field values, we still need to keep
      * track of an initialized but empty Intent value.*/
   }
   argument replaceAction0 = 0: replace action;
@@ -57,8 +57,8 @@ class android.content.Intent {
   argument path1 = 1: replace path, type android.net.Uri:path;
   argument uriQuery1 = 1: replace uriQuery, type android.net.Uri:uriQuery;
   argument authority1 = 1: replace authority, type android.net.Uri:authority;
-  argument appendedPaths1 = 1: replace appendedPaths, type android.net.Uri:appendedPaths;
-  argument appendedQueries1 = 1: replace appendedQueries, type android.net.Uri:appendedQueries;
+  argument appendedPaths1 = 1: replaceAll appendedPaths, type android.net.Uri:appendedPaths;
+  argument appendedQueries1 = 1: replaceAll appendedQueries, type android.net.Uri:appendedQueries;
   mod <android.content.Intent: void <init>(java.lang.String,android.net.Uri)> {
     argument replaceAction0;
     argument scheme1;
@@ -190,10 +190,10 @@ class android.content.Intent {
     argument addExtra;
   }
   mod <android.content.Intent: android.content.Intent putExtras(android.content.Intent)> {
-    0: add extras, type android.content.Intent:extras;
+    0: addAll extras, type android.content.Intent:extras;
   }
   mod <android.content.Intent: android.content.Intent putExtras(android.os.Bundle)> {
-    0: add extras, type android.os.Bundle:extras;
+    0: addAll extras, type android.os.Bundle:extras;
   }
   mod <android.content.Intent: android.content.Intent putIntegerArrayListExtra(java.lang.String,java.lang.ArrayList)> {
     argument addExtra;
@@ -211,10 +211,10 @@ class android.content.Intent {
     0: remove extras;
   }
   mod <android.content.Intent: android.content.Intent replaceExtras(android.content.Intent)> {
-    0: replace extras, type android.content.Intent:extras;
+    0: replaceAll extras, type android.content.Intent:extras;
   }
   mod <android.content.Intent: android.content.Intent replaceExtras(android.os.Bundle)> {
-    0: replace extras, type android.os.Bundle:extras;
+    0: replaceAll extras, type android.os.Bundle:extras;
   }
   mod <android.content.Intent: android.content.Intent setAction(java.lang.String)> {
     argument replaceAction0;
@@ -244,9 +244,9 @@ class android.content.Intent {
   argument path0 = 0: replace path, type android.net.Uri:path;
   argument uriQuery0 = 0: replace uriQuery, type android.net.Uri:uriQuery;
   argument authority0 = 0: replace authority, type android.net.Uri:authority;
-  argument appendedPaths0 = 0: replace appendedPaths, type android.net.Uri:appendedPaths;
-  argument appendedQueries0 = 0: replace appendedQueries, type android.net.Uri:appendedQueries;
-  
+  argument appendedPaths0 = 0: replaceAll appendedPaths, type android.net.Uri:appendedPaths;
+  argument appendedQueries0 = 0: replaceAll appendedQueries, type android.net.Uri:appendedQueries;
+
   mod <android.content.Intent: android.content.Intent setData(android.net.Uri)> {
     argument scheme0;
     argument ssp0;
@@ -257,7 +257,7 @@ class android.content.Intent {
     argument authority0;
     argument appendedPaths0;
     argument appendedQueries0;
-    clear dataType;
+    null dataType;
   }
   argument type1 = 1: replace dataType;
   mod <android.content.Intent: android.content.Intent setDataAndType(android.net.Uri,java.lang.String)> {
@@ -285,19 +285,19 @@ class android.content.Intent {
     argument type1;
   }
   mod <android.content.Intent: android.content.Intent setFlags(int)> {
-    0: replace flags;
+    0: replaceAll flags;
   }
   mod <android.content.Intent: android.content.Intent setPackage(java.lang.String)> {
     0: replace package;
   }
   argument type0 = 0: replace dataType;
-  argument clearScheme = clear scheme;
-  argument clearSsp = clear ssp;
-  argument clearFragment = clear fragment;
-  argument clearUri = clear uri;
-  argument clearPath = clear path;
-  argument clearUriQuery = clear uriQuery;
-  argument clearAuthority = clear authority;
+  argument clearScheme = null scheme;
+  argument clearSsp = null ssp;
+  argument clearFragment = null fragment;
+  argument clearUri = null uri;
+  argument clearPath = null path;
+  argument clearUriQuery = null uriQuery;
+  argument clearAuthority = null authority;
   argument clearAppendedPaths = clear appendedPaths;
   argument clearAppendedQueries = clear appendedQueries;
   mod <android.content.Intent: android.content.Intent setType(java.lang.String)> {
@@ -349,7 +349,7 @@ class android.content.Intent {
   super activity = android.app.Activity;
   mod gen activity : android.content.Intent getIntent() {
     replace action "<INTENT>";
-    replace categories "<INTENT>";
+    replaceAll categories "<INTENT>";
     replace extras "<INTENT>";
   }
 

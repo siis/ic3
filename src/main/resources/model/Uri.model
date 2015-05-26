@@ -19,15 +19,15 @@
 
 
 class android.net.Uri {
-  String scheme(1);
-  String ssp(1);
-  String fragment(1);
-  String uri(1);
-  String path(1);
-  String uriQuery(1);
-  String authority(1);
-  String appendedPaths;
-  String appendedQueries;
+  String scheme;
+  String ssp;
+  String fragment;
+  String uri;
+  String path;
+  String uriQuery;
+  String authority;
+  Set<String> appendedPaths;
+  Set<String> appendedQueries;
 
 
   copy <android.net.Uri: android.net.Uri withAppendedPath(android.net.Uri,java.lang.String)> {
@@ -54,7 +54,7 @@ class android.net.Uri {
     replace uri "content://media/external/audio/media";
     replace uri "content://media/internal/audio/media";
   }
-  
+
   mod copy <android.net.Uri: android.net.Uri$Builder buildUpon()> {}
   mod copy <android.net.Uri: android.net.Uri normalizeScheme()> {}
 

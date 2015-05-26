@@ -110,8 +110,8 @@ public class DbConnection extends SQLConnection {
     List<Integer> categoryIds = new ArrayList<Integer>();
 
     insertStrings(actionStringTable,
-        Collections.singleton(singleIntentValue.getSingleStringFieldValue("action")), actionIds);
-    insertStrings(categoryStringTable, singleIntentValue.getStringFieldValue("categories"),
+        Collections.singleton(singleIntentValue.getScalarStringFieldValue("action")), actionIds);
+    insertStrings(categoryStringTable, singleIntentValue.getSetStringFieldValue("categories"),
         categoryIds);
 
     // if (find) {
@@ -126,7 +126,7 @@ public class DbConnection extends SQLConnection {
 
     int intentId =
         intentTable.forceInsert(exitPointId,
-            singleIntentValue.getSingleStringFieldValue("clazz") == null, false);
+            singleIntentValue.getScalarStringFieldValue("clazz") == null, false);
 
     // for (int actionId : actionIds) {
     // intentActionTable.forceInsert(intentId, actionId);
@@ -136,7 +136,7 @@ public class DbConnection extends SQLConnection {
     // intentCategoryTable.forceInsert(intentId, categoryId);
     // }
     intentCategoryTable.batchForceInsert(intentId, categoryIds);
-    String type = singleIntentValue.getSingleStringFieldValue("dataType");
+    String type = singleIntentValue.getScalarStringFieldValue("dataType");
     if (type != null) {
       String[] typeParts = null;
       if (type.equals(Constants.ANY_STRING)) {
@@ -151,7 +151,7 @@ public class DbConnection extends SQLConnection {
         intentMimeTypeTable.forceInsert(intentId, typeParts[0], typeParts[1]);
       }
     }
-    Set<String> extras = singleIntentValue.getStringFieldValue("extras");
+    Set<String> extras = singleIntentValue.getSetStringFieldValue("extras");
     if (extras != null) {
       for (String extra : extras) {
         intentExtraTable.forceInsert(intentId, extra);
@@ -163,12 +163,12 @@ public class DbConnection extends SQLConnection {
       intentDataTable.forceInsert(intentId, dataId);
     }
 
-    String clazz = singleIntentValue.getSingleStringFieldValue("clazz");
+    String clazz = singleIntentValue.getScalarStringFieldValue("clazz");
     if (clazz != null) {
       intentClassTable.insert(intentId, clazz);
     }
 
-    String pkg = singleIntentValue.getSingleStringFieldValue("package");
+    String pkg = singleIntentValue.getScalarStringFieldValue("package");
     if (pkg != null) {
       intentPackageTable.insert(intentId, pkg);
     }
@@ -194,12 +194,12 @@ public class DbConnection extends SQLConnection {
         || singleIntentValue.containsNonNullFieldValue("path")
         || singleIntentValue.containsNonNullFieldValue("query")
         || singleIntentValue.containsNonNullFieldValue("authority")) {
-      return uriDataTable.forceInsert(singleIntentValue.getSingleStringFieldValue("scheme"),
-          singleIntentValue.getSingleStringFieldValue("ssp"),
-          singleIntentValue.getSingleStringFieldValue("uri"),
-          singleIntentValue.getSingleStringFieldValue("path"),
-          singleIntentValue.getSingleStringFieldValue("query"),
-          singleIntentValue.getSingleStringFieldValue("authority"));
+      return uriDataTable.forceInsert(singleIntentValue.getScalarStringFieldValue("scheme"),
+          singleIntentValue.getScalarStringFieldValue("ssp"),
+          singleIntentValue.getScalarStringFieldValue("uri"),
+          singleIntentValue.getScalarStringFieldValue("path"),
+          singleIntentValue.getScalarStringFieldValue("query"),
+          singleIntentValue.getScalarStringFieldValue("authority"));
     } else {
       return Constants.NOT_FOUND;
     }

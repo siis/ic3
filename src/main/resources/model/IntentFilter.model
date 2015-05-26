@@ -19,18 +19,18 @@
 
 
 class android.content.IntentFilter {
-  String actions;
-  String categories;
-  String dataType;
-  authority authorities;
-  path paths;
-  String schemes;
+  Set<String> actions;
+  Set<String> categories;
+  Set<String> dataType;
+  Set<authority> authorities;
+  Set<path> paths;
+  Set<String> schemes;
   int priority;
 
   copy <android.content.IntentFilter: void <init>(android.content.IntentFilter)> {
     0;
   }
-  argument replaceActions = 0: replace actions;
+  argument replaceActions = 0: replaceAll actions;
   mod <android.content.IntentFilter: void <init>(java.lang.String)> {
     argument replaceActions;
   }
