@@ -19,8 +19,8 @@
 
 
 class android.content.ComponentName {
-  String clazz(1);
-  String package(1);
+  String clazz;
+  String package;
 
   copy <android.content.ComponentName: void <init>(android.content.ComponentName)> {
     0;

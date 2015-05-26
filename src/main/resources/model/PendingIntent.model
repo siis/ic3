@@ -22,30 +22,30 @@ class android.app.PendingIntent {
   String targetType(1);
   String creatorPackage(1);
   String action(1);
-  String categories;
+  Set<String> categories;
   String package(1);
   String clazz(1);
-  int flags;
-  String extras;
+  Set<int> flags;
+  Set<String> extras;
   String dataType;
 
   /* URI parts.*/
-  String scheme(1);
-  String ssp(1);
-  String fragment(1);
-  String uri(1);
-  String path(1);
-  String uriQuery(1);
-  String authority(1);
-  String appendedPaths;
-  String appendedQueries;
+  String scheme;
+  String ssp;
+  String fragment;
+  String uri;
+  String path;
+  String uriQuery;
+  String authority;
+  Set<String> appendedPaths;
+  Set<String> appendedQueries;
 
   argument action2 = 2: replace action, type android.content.Intent:action;
-  argument categories2 = 2: replace categories, type android.content.Intent:categories;
+  argument categories2 = 2: replaceAll categories, type android.content.Intent:categories;
   argument package2 = 2: replace package, type android.content.Intent:package;
   argument clazz2 = 2: replace clazz, type android.content.Intent:clazz;
-  argument flags2 = 2: replace flags, type android.content.Intent:flags;
-  argument extras2 = 2: replace extras, type android.content.Intent:extras;
+  argument flags2 = 2: replaceAll flags, type android.content.Intent:flags;
+  argument extras2 = 2: replaceAll extras, type android.content.Intent:extras;
   argument dataType2 = 2: replace dataType, type android.content.Intent:dataType;
   argument scheme2 = 2: replace scheme, type android.content.Intent:scheme;
   argument ssp2 = 2: replace ssp, type android.content.Intent:ssp;
@@ -54,8 +54,8 @@ class android.app.PendingIntent {
   argument path2 = 2: replace path, type android.content.Intent:path;
   argument uriQuery2 = 2: replace uriQuery, type android.content.Intent:uriQuery;
   argument authority2 = 2: replace authority, type android.content.Intent:authority;
-  argument appendedPaths2 = 2: replace appendedPaths, type android.content.Intent:appendedPaths;
-  argument appendedQueries2 = 2: replace appendedQueries, type android.content.Intent:appendedQueries;
+  argument appendedPaths2 = 2: replaceAll appendedPaths, type android.content.Intent:appendedPaths;
+  argument appendedQueries2 = 2: replaceAll appendedQueries, type android.content.Intent:appendedQueries;
   mod gen <android.app.PendingIntent: android.app.PendingIntent getActivity(android.content.Context,int,android.content.Intent,int)> {
     replace targetType "a";
     0: replace creatorPackage, type context;

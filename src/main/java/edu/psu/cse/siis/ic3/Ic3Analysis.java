@@ -96,7 +96,10 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
         new ClassTypeValueAnalysis());
     ArgumentValueManager.v().registerArgumentValueAnalysis("authority",
         new AuthorityValueAnalysis());
+    ArgumentValueManager.v().registerArgumentValueAnalysis("Set<authority>",
+        new AuthorityValueAnalysis());
     ArgumentValueManager.v().registerArgumentValueAnalysis("path", new PathValueAnalysis());
+    ArgumentValueManager.v().registerArgumentValueAnalysis("Set<path>", new PathValueAnalysis());
   }
 
   @Override

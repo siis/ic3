@@ -19,20 +19,20 @@
 
 
 class android.net.Uri$Builder {
-  String scheme(1);
-  String ssp(1);
-  String fragment(1);
-  String uri(1);
-  String path(1);
-  String uriQuery(1);
-  String authority(1);
-  String appendedPaths;
-  String appendedQueries;
+  String scheme;
+  String ssp;
+  String fragment;
+  String uri;
+  String path;
+  String uriQuery;
+  String authority;
+  Set<String> appendedPaths;
+  Set<String> appendedQueries;
 
 
   copy <android.content.ContentUris: android.net.Uri$Builder appendId(android.net.Uri$Builder,long)> {
     0;
-    1: replace appendedPaths, type int;
+    1: replaceAll appendedPaths, type int;
   }
 
   mod <android.net.Uri$Builder: void <init>()> {}
@@ -52,7 +52,7 @@ class android.net.Uri$Builder {
     argument authority0;
   }
   mod <android.net.Uri$Builder: android.net.Uri$Builder clearQuery()> {
-    clear uriQuery;
+    null uriQuery;
     clear appendedQueries;
   }
   mod <android.net.Uri$Builder: android.net.Uri$Builder encodedAuthority(java.lang.String)> {
