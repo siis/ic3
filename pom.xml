@@ -23,7 +23,7 @@
 
   <groupId>edu.psu.cse.siis</groupId>
   <artifactId>ic3</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.1.1-SNAPSHOT</version>
 
   <name>IC3: Inter-Component Communication Analysis in Android</name>
   <description>The IC3 tool for inferring Inter-Component Communication in Android</description>
