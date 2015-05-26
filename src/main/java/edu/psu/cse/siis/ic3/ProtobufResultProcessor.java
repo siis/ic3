@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import edu.psu.cse.siis.coal.Result;
 import edu.psu.cse.siis.coal.Results;
 import edu.psu.cse.siis.coal.arguments.Argument;
 import edu.psu.cse.siis.coal.field.values.FieldValue;
+import edu.psu.cse.siis.coal.field.values.ScalarFieldValue;
 import edu.psu.cse.siis.coal.field.values.TopFieldValue;
 import edu.psu.cse.siis.coal.values.BasePropagationValue;
 import edu.psu.cse.siis.coal.values.BottomPropagationValue;
@@ -123,8 +125,10 @@ public class ProtobufResultProcessor {
     if (logger.isInfoEnabled()) {
       logger.info(statistics);
     }
-    writer.write(statistics);
-    writer.close();
+    if (writer != null) {
+      writer.write(statistics);
+      writer.close();
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -183,7 +187,7 @@ public class ProtobufResultProcessor {
               (BasePropagationValue) valueMap.get("pendingIntent");
           String targetType =
               baseCollectingValue instanceof PropagationValue ? (String) ((PropagationValue) baseCollectingValue)
-                  .getValuesForField("targetType").iterator().next().getValues().iterator().next()
+                  .getValuesForField("targetType").iterator().next().getValue()
                   : null;
           Set<String> permissions = (Set<String>) valueMap.get("permission");
           if (targetType != null) {
@@ -280,13 +284,13 @@ public class ProtobufResultProcessor {
 
     insertSingleValuedIntentAttribute(intentValue, "action", AttributeKind.ACTION, intentBuilder);
 
-    Set<String> categories = intentValue.getStringFieldValue("categories");
+    Set<String> categories = intentValue.getSetStringFieldValue("categories");
     if (categories != null) {
       intentBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.CATEGORY)
           .addAllValue(categories));
     }
 
-    Set<Integer> flags = intentValue.getFieldValue("flags", Integer.class);
+    Set<Integer> flags = intentValue.getSetFieldValue("flags", Integer.class);
     if (flags != null) {
       intentBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.FLAG)
           .addAllIntValue(flags));
@@ -311,7 +315,7 @@ public class ProtobufResultProcessor {
     // }
     insertSingleValuedIntentAttribute(intentValue, "dataType", AttributeKind.TYPE, intentBuilder);
 
-    Set<String> extras = intentValue.getStringFieldValue("extras");
+    Set<String> extras = intentValue.getSetStringFieldValue("extras");
     if (extras != null) {
       intentBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.EXTRA)
           .addAllValue(extras));
@@ -332,7 +336,7 @@ public class ProtobufResultProcessor {
 
   private void insertSingleValuedIntentAttribute(PathValue pathValue, String attribute,
       AttributeKind kind, Intent.Builder intentBuilder) {
-    String attributeValue = pathValue.getSingleStringFieldValue(attribute);
+    String attributeValue = pathValue.getScalarStringFieldValue(attribute);
     if (attributeValue != null) {
       intentBuilder.addAttributes(Attribute.newBuilder().setKind(kind).addValue(attributeValue));
     }
@@ -352,7 +356,7 @@ public class ProtobufResultProcessor {
 
   private void insertSingleValuedUriAttribute(PathValue pathValue, String attribute,
       AttributeKind kind, Uri.Builder uriBuilder) {
-    String attributeValue = pathValue.getSingleStringFieldValue(attribute);
+    String attributeValue = pathValue.getScalarStringFieldValue(attribute);
     if (attributeValue != null) {
       uriBuilder.addAttributes(Attribute.newBuilder().setKind(kind).addValue(attributeValue));
     }
@@ -401,11 +405,11 @@ public class ProtobufResultProcessor {
         Integer filterPriority = null;
         FieldValue priorityFieldValue = branchValue.getFieldValue("priority");
         if (priorityFieldValue != null) {
-          filterPriority = (Integer) priorityFieldValue.getValues().iterator().next();
+          filterPriority = (Integer) priorityFieldValue.getValue();
         }
         manifestIntentFilters.add(new ManifestIntentFilter(branchValue
-            .getStringFieldValue("actions"), branchValue.getStringFieldValue("categories"), false,
-            makeManifestData(branchValue), filterPriority));
+            .getSetStringFieldValue("actions"), branchValue.getSetStringFieldValue("categories"),
+            false, makeManifestData(branchValue), filterPriority));
 
       }
     } else {
@@ -425,10 +429,11 @@ public class ProtobufResultProcessor {
   }
 
   private List<ManifestData> makeManifestData(PathValue branchValue) {
-    Set<String> mimeTypes = branchValue.getStringFieldValue("dataType");
-    Set<DataAuthority> authorities = branchValue.getFieldValue("authorities", DataAuthority.class);
-    Set<String> paths = branchValue.getStringFieldValue("paths");
-    Set<String> schemes = branchValue.getStringFieldValue("schemes");
+    Set<String> mimeTypes = branchValue.getSetStringFieldValue("dataType");
+    Set<DataAuthority> authorities =
+        branchValue.getSetFieldValue("authorities", DataAuthority.class);
+    Set<String> paths = branchValue.getSetStringFieldValue("paths");
+    Set<String> schemes = branchValue.getSetStringFieldValue("schemes");
 
     if (mimeTypes == null && authorities == null && paths == null && schemes == null) {
       return null;
@@ -470,11 +475,10 @@ public class ProtobufResultProcessor {
     PropagationValue collectingValue = new PropagationValue();
     for (String authority : authorities) {
       PathValue branchValue = new PathValue();
-      FieldValue schemeFieldValue = new FieldValue();
-      schemeFieldValue.addAll(Collections.singleton((Object) "content"));
+      ScalarFieldValue schemeFieldValue = new ScalarFieldValue("content");
       branchValue.addFieldEntry("scheme", schemeFieldValue);
-      FieldValue authorityFieldValue = new FieldValue();
-      authorityFieldValue.addAll(Collections.singleton((Object) authority));
+      ScalarFieldValue authorityFieldValue = new ScalarFieldValue(authority);
+      branchValue.addFieldEntry("authority", authorityFieldValue);
       collectingValue.addPathValue(branchValue);
     }
 
@@ -493,6 +497,7 @@ public class ProtobufResultProcessor {
     return -1;
   }
 
+  @SuppressWarnings("unchecked")
   private void analyzeResult(Result result) {
     Set<String> nonLinkingFieldNames = new HashSet<>();
     nonLinkingFieldNames.add("extras");
@@ -501,7 +506,7 @@ public class ProtobufResultProcessor {
     nonLinkingFieldNames.add("query");
 
     for (Map.Entry<Unit, Map<Integer, Object>> entry0 : result.getResults().entrySet()) {
-      Map<Integer, Object> value = entry0.getValue();
+      Collection<Object> argumentValues = entry0.getValue().values();
       boolean top = false;
       boolean bottom = false;
       // This is true only if the linking field are precisely known.
@@ -514,7 +519,7 @@ public class ProtobufResultProcessor {
 
       int resultIndex = getResultIndex((Stmt) entry0.getKey());
 
-      for (Object value2 : value.values()) {
+      for (Object value2 : argumentValues) {
         if (value2 == null) {
           nonexistent = true;
         } else if (value2 instanceof TopPropagationValue) {
@@ -539,54 +544,36 @@ public class ProtobufResultProcessor {
                   preciseLinking = false;
                 }
               } else {
-                Set<Object> values = fieldValue.getValues();
-                if (values == null) {
+                Object value = fieldValue.getValue();
+                if (value == null) {
                   continue;
-                } else if (values.contains(Constants.ANY_STRING)
-                    || values.contains(Constants.ANY_CLASS)
-                    || values.contains(Constants.INVALID_FLAG)
-                    || values.contains(ENTRY_POINT_INTENT) || values.contains("(.*)")
-                    || values.contains("top")
-                /* || containsPartialDefinition(values) */) {
-                  for (Object singleFieldValue : values) {
-                    if (singleFieldValue.equals(Constants.ANY_STRING)
-                        || singleFieldValue.equals(Constants.ANY_CLASS)
-                        || singleFieldValue.equals(Constants.INVALID_FLAG)
-                        || singleFieldValue.equals("(.*)")) {
-                      ++this.impreciseFieldValueCount[resultIndex];
-                    } else if (singleFieldValue instanceof String
-                        && ((String) singleFieldValue).contains("(.*)")) {
-                      ++this.partiallyPreciseFieldValueCount[resultIndex];
-                    } else {
-                      ++this.preciseFieldValueCount[resultIndex];
+                }
+
+                if (value instanceof Set) {
+                  Set<Object> values = (Set<Object>) value;
+
+                  if (values.contains(Constants.ANY_STRING) || values.contains(Constants.ANY_CLASS)
+                      || values.contains(Constants.ANY_INT) || values.contains(ENTRY_POINT_INTENT)
+                      || values.contains("top")) {
+                    if (values.contains(ENTRY_POINT_INTENT)) {
+                      entryPointIntent = true;
                     }
-                  }
-                  if (values.contains(ENTRY_POINT_INTENT)) {
-                    entryPointIntent = true;
-                  }
-                  if (nonLinkingFieldNames.contains(fieldName)) {
                     preciseNonLinking = false;
-                  } else {
-                    preciseNonLinking = false;
-                    preciseLinking = false;
+                    if (!nonLinkingFieldNames.contains(fieldName)) {
+                      preciseLinking = false;
+                    }
                   }
                 } else {
-                  if (containsPartialDefinition(values)) {
-                    for (Object singleFieldValue : values) {
-                      if (singleFieldValue.equals(Constants.ANY_STRING)
-                          || singleFieldValue.equals(Constants.ANY_CLASS)
-                          || singleFieldValue.equals(Constants.INVALID_FLAG)
-                          || singleFieldValue.equals("(.*)")) {
-                        ++this.impreciseFieldValueCount[resultIndex];
-                      } else if (singleFieldValue instanceof String
-                          && ((String) singleFieldValue).contains("(.*)")) {
-                        ++this.partiallyPreciseFieldValueCount[resultIndex];
-                      } else {
-                        ++this.preciseFieldValueCount[resultIndex];
-                      }
+                  if (value.equals(Constants.ANY_STRING) || value.equals(Constants.ANY_CLASS)
+                      || value.equals(Constants.ANY_INT) || value.equals(ENTRY_POINT_INTENT)
+                      || value.equals("top")) {
+                    if (value.equals(ENTRY_POINT_INTENT)) {
+                      entryPointIntent = true;
                     }
-                  } else {
-                    this.preciseFieldValueCount[resultIndex] += values.size();
+                    preciseNonLinking = false;
+                    if (!nonLinkingFieldNames.contains(fieldName)) {
+                      preciseLinking = false;
+                    }
                   }
                 }
               }
@@ -642,16 +629,13 @@ public class ProtobufResultProcessor {
     Set<String> fields = fieldMap.keySet();
 
     if (fields.contains("action") || fields.contains("categories")) {
-      if ((fields.contains("uri") && fieldMap.get("uri") != null
-          && fieldMap.get("uri").getValues() != null && fieldMap.get("uri").getValues().size() != 0)
-          || (fields.contains("path") && fieldMap.get("path") != null
-              && fieldMap.get("path").getValues() != null && fieldMap.get("path").getValues()
-              .size() != 0)
-          || (fields.contains("scheme") && fieldMap.get("scheme") != null
-              && fieldMap.get("scheme").getValues() != null && fieldMap.get("scheme").getValues()
-              .size() != 0)
-          || (fields.contains("ssp") && fieldMap.get("ssp") != null
-              && fieldMap.get("ssp").getValues() != null && fieldMap.get("ssp").getValues().size() != 0)) {
+      if ((fields.contains("uri") && fieldMap.get("uri") != null && fieldMap.get("uri").getValue() != null)
+          || (fields.contains("path") && fieldMap.get("path") != null && fieldMap.get("path")
+              .getValue() != null)
+          || (fields.contains("scheme") && fieldMap.get("scheme") != null && fieldMap.get("scheme")
+              .getValue() != null)
+          || (fields.contains("ssp") && fieldMap.get("ssp") != null && fieldMap.get("ssp")
+              .getValue() != null)) {
         return true;
       }
     }
