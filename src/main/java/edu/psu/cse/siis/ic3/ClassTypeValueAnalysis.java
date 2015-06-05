@@ -27,11 +27,12 @@ import java.util.Set;
 import soot.Scene;
 import soot.SootClass;
 import soot.Unit;
+import soot.Value;
 import soot.jimple.Stmt;
 import edu.psu.cse.siis.coal.arguments.Argument;
 import edu.psu.cse.siis.coal.arguments.ArgumentValueAnalysis;
 
-public class ClassTypeValueAnalysis implements ArgumentValueAnalysis {
+public class ClassTypeValueAnalysis extends ArgumentValueAnalysis {
 
   private static final String BROADCAST_RECEIVER = "android.content.BroadcastReceiver";
   private static final String TOP_VALUE = BROADCAST_RECEIVER;
@@ -64,6 +65,11 @@ public class ClassTypeValueAnalysis implements ArgumentValueAnalysis {
   @Override
   public Object getTopValue() {
     return TOP_VALUE;
+  }
+
+  @Override
+  public Set<Object> computeVariableValues(Value value, Stmt callSite) {
+    throw new RuntimeException("Should not be reached.");
   }
 
 }

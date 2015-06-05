@@ -23,29 +23,37 @@ import java.util.HashSet;
 import java.util.Set;
 
 import soot.Unit;
+import soot.Value;
+import soot.jimple.InvokeExpr;
+import soot.jimple.Stmt;
 import edu.psu.cse.siis.coal.Constants;
 import edu.psu.cse.siis.coal.arguments.Argument;
 import edu.psu.cse.siis.coal.arguments.ArgumentValueAnalysis;
 import edu.psu.cse.siis.coal.arguments.ArgumentValueManager;
 
-public class AuthorityValueAnalysis implements ArgumentValueAnalysis {
+public class AuthorityValueAnalysis extends ArgumentValueAnalysis {
 
   private static final Object TOP_VALUE = new DataAuthority(Constants.ANY_STRING,
       Constants.ANY_STRING);
 
   @Override
   public Set<Object> computeArgumentValues(Argument argument, Unit callSite) {
-    Argument argument0 = new Argument(argument);
-    argument0.setArgnum(new int[] { argument.getArgnum()[0] });
-    argument0.setType(Constants.DefaultArgumentTypes.Scalar.STRING);
-    Argument argument1 = new Argument(argument);
-    argument1.setArgnum(new int[] { argument.getArgnum()[1] });
-    argument1.setType(Constants.DefaultArgumentTypes.Scalar.STRING);
+    ArgumentValueAnalysis stringAnalysis =
+        ArgumentValueManager.v().getArgumentValueAnalysis(
+            Constants.DefaultArgumentTypes.Scalar.STRING);
 
-    Set<Object> hosts = ArgumentValueManager.v().getArgumentValues(argument0, callSite);
-    Set<Object> ports = ArgumentValueManager.v().getArgumentValues(argument1, callSite);
+    Stmt stmt = (Stmt) callSite;
+    if (!stmt.containsInvokeExpr()) {
+      throw new RuntimeException("Statement " + stmt + " does not contain an invoke expression");
+    }
+    InvokeExpr invokeExpr = stmt.getInvokeExpr();
+
+    Set<Object> hosts =
+        stringAnalysis.computeVariableValues(invokeExpr.getArg(argument.getArgnum()[0]), stmt);
+    Set<Object> ports =
+        stringAnalysis.computeVariableValues(invokeExpr.getArg(argument.getArgnum()[1]), stmt);
+
     Set<Object> result = new HashSet<>();
-
     for (Object host : hosts) {
       for (Object port : ports) {
         result.add(new DataAuthority((String) host, (String) port));
@@ -63,6 +71,11 @@ public class AuthorityValueAnalysis implements ArgumentValueAnalysis {
   @Override
   public Object getTopValue() {
     return TOP_VALUE;
+  }
+
+  @Override
+  public Set<Object> computeVariableValues(Value value, Stmt callSite) {
+    throw new RuntimeException("Should not be reached.");
   }
 
 }

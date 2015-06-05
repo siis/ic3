@@ -24,7 +24,8 @@ import java.util.Set;
 import soot.Scene;
 import soot.jimple.InstanceInvokeExpr;
 import soot.jimple.InvokeExpr;
-import edu.psu.cse.siis.coal.arguments.ClassValueAnalysis;
+import edu.psu.cse.siis.coal.Constants;
+import edu.psu.cse.siis.coal.arguments.ArgumentValueManager;
 import edu.psu.cse.siis.coal.arguments.LanguageConstraints.Call;
 import edu.psu.cse.siis.coal.arguments.MethodReturnValueAnalysis;
 import edu.psu.cse.siis.coal.arguments.MethodReturnValueManager;
@@ -60,8 +61,9 @@ public class AndroidMethodReturnValueAnalyses {
             if (invokeExpr instanceof InstanceInvokeExpr) {
               InstanceInvokeExpr instanceInvokeExpr = (InstanceInvokeExpr) invokeExpr;
               if (invokeExpr.getMethod().getDeclaringClass().getName().equals("java.lang.Class")) {
-                return new ClassValueAnalysis().findClassConstantValues(call.stmt,
-                    instanceInvokeExpr.getBase());
+                return ArgumentValueManager.v()
+                    .getArgumentValueAnalysis(Constants.DefaultArgumentTypes.Scalar.CLASS)
+                    .computeVariableValues(instanceInvokeExpr.getBase(), call.stmt);
               }
             }
 

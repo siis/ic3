@@ -23,12 +23,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import soot.Unit;
+import soot.Value;
+import soot.jimple.Stmt;
 import edu.psu.cse.siis.coal.Constants;
 import edu.psu.cse.siis.coal.arguments.Argument;
 import edu.psu.cse.siis.coal.arguments.ArgumentValueAnalysis;
 import edu.psu.cse.siis.coal.arguments.ArgumentValueManager;
 
-public class PathValueAnalysis implements ArgumentValueAnalysis {
+public class PathValueAnalysis extends ArgumentValueAnalysis {
 
   private static final String TOP_VALUE = Constants.ANY_STRING;
 
@@ -80,6 +82,11 @@ public class PathValueAnalysis implements ArgumentValueAnalysis {
   @Override
   public Object getTopValue() {
     return TOP_VALUE;
+  }
+
+  @Override
+  public Set<Object> computeVariableValues(Value value, Stmt callSite) {
+    throw new RuntimeException("Should not be reached.");
   }
 
 }
