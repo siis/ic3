@@ -24,11 +24,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import soot.Unit;
+import soot.Value;
+import soot.jimple.Stmt;
 import edu.psu.cse.siis.coal.Constants;
 import edu.psu.cse.siis.coal.arguments.Argument;
 import edu.psu.cse.siis.coal.arguments.ArgumentValueAnalysis;
 
-public class ContextValueAnalysis implements ArgumentValueAnalysis {
+public class ContextValueAnalysis extends ArgumentValueAnalysis {
 
   private static final String TOP_VALUE = Constants.ANY_STRING;
 
@@ -51,6 +53,11 @@ public class ContextValueAnalysis implements ArgumentValueAnalysis {
   @Override
   public Object getTopValue() {
     return TOP_VALUE;
+  }
+
+  @Override
+  public Set<Object> computeVariableValues(Value value, Stmt callSite) {
+    throw new RuntimeException("Should not be reached.");
   }
 
 }
