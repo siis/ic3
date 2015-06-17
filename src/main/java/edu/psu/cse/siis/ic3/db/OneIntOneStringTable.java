@@ -20,6 +20,8 @@ package edu.psu.cse.siis.ic3.db;
 
 import java.sql.SQLException;
 
+import edu.psu.cse.siis.coal.Constants;
+
 public abstract class OneIntOneStringTable extends Table {
   private static final String INSERT = "INSERT INTO %s (%s, %s) VALUES (?, ?)";
   private static final String FIND = "SELECT id FROM %s WHERE %s = ? AND %s = ?";
@@ -40,6 +42,9 @@ public abstract class OneIntOneStringTable extends Table {
   public int forceInsert(int firstValue, String secondValue) throws SQLException {
     if (insertStatement == null || insertStatement.isClosed()) {
       insertStatement = getConnection().prepareStatement(insertString);
+    }
+    if (secondValue == null) {
+      secondValue = Constants.NULL_STRING;
     }
     insertStatement.setInt(1, firstValue);
     insertStatement.setString(2, secondValue);

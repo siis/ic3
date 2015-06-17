@@ -341,12 +341,12 @@
     <dependency>
       <groupId>infoflow</groupId>
       <artifactId>infoflow</artifactId>
-      <version>20140129</version>
+      <version>20150607</version>
     </dependency>
     <dependency>
       <groupId>infoflow-android</groupId>
       <artifactId>infoflow-android</artifactId>
-      <version>20140213</version>
+      <version>20150607</version>
     </dependency>
     <dependency>
       <groupId>com.google.protobuf</groupId>

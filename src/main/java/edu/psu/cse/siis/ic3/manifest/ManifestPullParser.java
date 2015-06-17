@@ -29,12 +29,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import soot.jimple.infoflow.android.manifest.ProcessManifest;
 import edu.psu.cse.siis.ic3.Ic3Data;
 import edu.psu.cse.siis.ic3.Ic3Data.Application.Builder;
 import edu.psu.cse.siis.ic3.Ic3Data.Application.Component;
@@ -46,8 +47,9 @@ import edu.psu.cse.siis.ic3.db.Constants;
 import edu.psu.cse.siis.ic3.db.SQLConnection;
 import edu.psu.cse.siis.ic3.manifest.binary.AXmlResourceParser;
 
-public class ManifestPullParser extends ProcessManifest {
+public class ManifestPullParser {
   private static final String MANIFEST = "manifest";
+  private static final String MANIFEST_FILE_NAME = "AndroidManifest.xml";
   private static final String ACTIVITY = "activity";
   private static final String ACTIVITY_ALIAS = "activity-alias";
   private static final String SERVICE = "service";
@@ -88,6 +90,9 @@ public class ManifestPullParser extends ProcessManifest {
   private static final String SIGNATURE = "signature";
   private static final String SIGNATURE_OR_SYSTEM = "signatureOrSytem";
 
+  private String applicationName;
+  private String packageName;
+
   private static final String[] levelValueToShortString = { Constants.PermissionLevel.NORMAL_SHORT,
       Constants.PermissionLevel.DANGEROUS_SHORT, Constants.PermissionLevel.SIGNATURE_SHORT,
       Constants.PermissionLevel.SIGNATURE_OR_SYSTEM_SHORT };
@@ -113,7 +118,9 @@ public class ManifestPullParser extends ProcessManifest {
   private ManifestIntentFilter currentIntentFilter = null;
   private String skipToEndTag = null;
   private String applicationPermission = null;
+  private final Set<String> usesPermissions = new HashSet<>();
   private Map<String, String> permissions = new HashMap<String, String>();
+  private final Set<String> entryPointClasses = new HashSet<>();
 
   public List<ManifestComponent> getActivities() {
     return activities;
@@ -145,26 +152,59 @@ public class ManifestPullParser extends ProcessManifest {
     return componentNames;
   }
 
+  private void setApplicationName(String applicationName) {
+    this.applicationName = applicationName;
+  }
+
+  public String getApplicationName() {
+    return applicationName;
+  }
+
+  private void setPackageName(String packageName) {
+    this.packageName = packageName;
+  }
+
+  public String getPackageName() {
+    return packageName;
+  }
+
+  public Set<String> getEntryPointClasses() {
+    return entryPointClasses;
+  }
+
   private void addComponentNamesToList(List<ManifestComponent> components, List<String> output) {
     for (ManifestComponent manifestComponent : components) {
       output.add(manifestComponent.getName());
     }
   }
 
-  @Override
   public void loadManifestFile(String manifest) {
     try {
       if (manifest.endsWith(".xml")) {
         loadClassesFromTextManifest(new FileInputStream(manifest));
       } else {
-        super.loadManifestFile(manifest);
+        handleBinaryManifestFile(manifest);
       }
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
   }
 
-  @Override
+  private void handleBinaryManifestFile(String apk) {
+    try {
+      ZipFile archive = new ZipFile(apk);
+      ZipEntry manifestEntry = archive.getEntry(MANIFEST_FILE_NAME);
+      if (manifestEntry == null) {
+        archive.close();
+        throw new RuntimeException("No manifest file found in apk");
+      }
+      loadClassesFromBinaryManifest(archive.getInputStream(manifestEntry));
+      archive.close();
+    } catch (IOException e) {
+      throw new RuntimeException("Error while processing apk " + apk + ": " + e);
+    }
+  }
+
   protected void loadClassesFromBinaryManifest(InputStream manifestIS) {
     AXmlResourceParser aXmlResourceParser = new AXmlResourceParser();
     aXmlResourceParser.open(manifestIS);
@@ -176,7 +216,6 @@ public class ManifestPullParser extends ProcessManifest {
     }
   }
 
-  @Override
   protected void loadClassesFromTextManifest(InputStream manifestIS) {
     try {
       XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
@@ -192,7 +231,7 @@ public class ManifestPullParser extends ProcessManifest {
 
   /**
    * Parse the manifest file.
-   * 
+   *
    * @param reader Input if text XML.
    * @param is Input if binary XML.
    * @throws IOException
@@ -226,7 +265,7 @@ public class ManifestPullParser extends ProcessManifest {
     Map<String, Integer> componentIds = new HashMap<String, Integer>();
 
     componentIds.putAll(SQLConnection.insert(getPackageName(), version, activities,
-        getPermissions(), permissions, skipEntryPoints));
+        usesPermissions, permissions, skipEntryPoints));
     componentIds.putAll(SQLConnection.insert(getPackageName(), version, activityAliases, null,
         null, skipEntryPoints));
     componentIds.putAll(SQLConnection.insert(getPackageName(), version, services, null, null,
@@ -240,7 +279,7 @@ public class ManifestPullParser extends ProcessManifest {
   }
 
   public boolean isComponent(String name) {
-    return getEntryPointClasses().contains(name);
+    return entryPointClasses.contains(name);
   }
 
   public Map<String, Ic3Data.Application.Component.Builder> populateProtobuf(Builder ic3Builder) {
@@ -254,7 +293,7 @@ public class ManifestPullParser extends ProcessManifest {
       ic3Builder.addPermissions(protobufPermission);
     }
 
-    ic3Builder.addAllUsedPermissions(getPermissions());
+    ic3Builder.addAllUsedPermissions(usesPermissions);
 
     Map<String, Ic3Data.Application.Component.Builder> componentNameToBuilderMap = new HashMap<>();
 
@@ -608,8 +647,8 @@ public class ManifestPullParser extends ProcessManifest {
     }
 
     if (name == null
-        || (targetActivity != null && !getEntryPointClasses().contains(
-            canonicalizeComponentName(targetActivity)))) {
+        || (targetActivity != null && !entryPointClasses
+            .contains(canonicalizeComponentName(targetActivity)))) {
       skipToEndTag = endTag;
       return true;
     }
@@ -626,7 +665,7 @@ public class ManifestPullParser extends ProcessManifest {
 
   private boolean handleComponentEnd(XmlPullParser parser, List<ManifestComponent> componentSet) {
     currentComponent.setIntentFiltersAndExported(currentIntentFilters);
-    getEntryPointClasses().add(currentComponent.getName());
+    entryPointClasses.add(currentComponent.getName());
     componentSet.add(currentComponent);
     currentComponent = null;
     currentIntentFilters = null;
@@ -651,7 +690,7 @@ public class ManifestPullParser extends ProcessManifest {
   private boolean handleUsesPermissionStart(XmlPullParser parser) {
     String permission = parser.getAttributeValue(NAMESPACE, NAME);
     if (permission != null) {
-      getPermissions().add(permission);
+      usesPermissions.add(permission);
     }
     return true;
   }
@@ -671,10 +710,10 @@ public class ManifestPullParser extends ProcessManifest {
 
   /**
    * Transform the protection level to something appropriate for the database.
-   * 
+   *
    * The protection level is stored in two different ways. In a binary manifest, it is an integer.
    * In a text manifest, it is the string designation of the protection level.
-   * 
+   *
    * @param protectionLevel The protection level found in the manifest.
    * @return A string representation for the protection level appropriate for the database.
    */
@@ -762,7 +801,8 @@ public class ManifestPullParser extends ProcessManifest {
       name = getPackageName() + name;
     }
 
-    return name;
+    // Found a case where there was a '/' instead of a '.'.
+    return name.replace('/', '.');
   }
 
   private boolean handleManifestStart(XmlPullParser parser) {
