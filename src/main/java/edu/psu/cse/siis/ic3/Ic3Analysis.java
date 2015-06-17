@@ -26,7 +26,6 @@ import java.io.Writer;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -39,6 +38,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmlpull.v1.XmlPullParserException;
 
 import soot.PackManager;
 import soot.Scene;
@@ -76,9 +76,10 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
 
   protected String outputDir;
   protected Writer writer;
-  protected ProcessManifest manifest;
+  protected ManifestPullParser detailedManifest;
   protected Map<String, Integer> componentToIdMap;
   protected SetupApplication setupApplication;
+  protected String packageName;
 
   @Override
   protected void registerFieldTransformerFactories(Ic3CommandLineArguments commandLineArguments) {
@@ -114,7 +115,7 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
     if (commandLineArguments.getDb() != null) {
       SQLConnection.init(commandLineArguments.getDb(), commandLineArguments.getSsh(),
           commandLineArguments.getDbLocalPort());
-      componentToIdMap = ((ManifestPullParser) manifest).writeToDb(false);
+      componentToIdMap = detailedManifest.writeToDb(false);
     }
 
     Timers.v().mainGeneration.start();
@@ -124,10 +125,26 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
 
     Map<String, Set<String>> callBackMethods;
 
+    Set<String> entryPointClasses = null;
+    if (detailedManifest == null) {
+      ProcessManifest manifest;
+      try {
+        manifest = new ProcessManifest(commandLineArguments.getManifest());
+        entryPointClasses = manifest.getEntryPointClasses();
+        packageName = manifest.getPackageName();
+      } catch (IOException | XmlPullParserException e) {
+        throw new FatalAnalysisException("Could not process manifest file "
+            + commandLineArguments.getManifest() + ": " + e);
+      }
+    } else {
+      entryPointClasses = detailedManifest.getEntryPointClasses();
+      packageName = detailedManifest.getPackageName();
+    }
+
     try {
       callBackMethods =
           setupApplication.calculateSourcesSinksEntrypoints(new HashSet<AndroidMethod>(),
-              new HashSet<AndroidMethod>(), manifest);
+              new HashSet<AndroidMethod>(), packageName, entryPointClasses);
     } catch (IOException e) {
       logger.error("Could not calculate entry points", e);
       throw new FatalAnalysisException();
@@ -136,18 +153,13 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
 
     Timers.v().misc.start();
 
-    if (manifest == null) {
-      manifest = setupApplication.getManifest();
-    }
-
     // Application package name is now known.
-    String appName = manifest.getPackageName();
     ArgumentValueManager.v().registerArgumentValueAnalysis("context",
-        new ContextValueAnalysis(appName));
-    AndroidMethodReturnValueAnalyses.registerAndroidMethodReturnValueAnalyses(appName);
+        new ContextValueAnalysis(packageName));
+    AndroidMethodReturnValueAnalyses.registerAndroidMethodReturnValueAnalyses(packageName);
 
-    if (outputDir != null && appName != null) {
-      String outputFile = String.format("%s/%s.csv", outputDir, appName);
+    if (outputDir != null && packageName != null) {
+      String outputFile = String.format("%s/%s.csv", outputDir, packageName);
 
       try {
         writer = new BufferedWriter(new FileWriter(outputFile, false));
@@ -164,7 +176,7 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
     addSceneTransformer(entryPointMap);
 
     if (commandLineArguments.computeComponents()) {
-      addEntryPointMappingSceneTransformer(manifest, callBackMethods, entryPointMap);
+      addEntryPointMappingSceneTransformer(entryPointClasses, callBackMethods, entryPointMap);
     }
 
     Options.v().set_no_bodies_for_excluded(true);
@@ -206,15 +218,14 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
 
     Timers.v().entryPointMapping.start();
     Scene.v().setEntryPoints(
-        Collections.singletonList(setupApplication.getEntryPointCreator().createDummyMain(
-            new ArrayList<String>())));
+        Collections.singletonList(setupApplication.getEntryPointCreator().createDummyMain()));
     Timers.v().entryPointMapping.end();
   }
 
   protected void prepareManifestFile(Ic3CommandLineArguments commandLineArguments) {
     if (commandLineArguments.getDb() != null) {
-      manifest = new ManifestPullParser();
-      manifest.loadManifestFile(commandLineArguments.getManifest());
+      detailedManifest = new ManifestPullParser();
+      detailedManifest.loadManifestFile(commandLineArguments.getManifest());
     }
   }
 
@@ -229,13 +240,12 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
   @Override
   protected void handleFatalAnalysisException(Ic3CommandLineArguments commandLineArguments,
       FatalAnalysisException exception) {
-    String appName = manifest != null ? manifest.getPackageName() : "";
-    logger.error("Could not process application " + appName, exception);
+    logger.error("Could not process application " + packageName, exception);
 
-    if (outputDir != null && !appName.equals("")) {
+    if (outputDir != null && packageName != null) {
       try {
         if (writer == null) {
-          String outputFile = String.format("%s/%s.csv", outputDir, appName);
+          String outputFile = String.format("%s/%s.csv", outputDir, packageName);
 
           writer = new BufferedWriter(new FileWriter(outputFile, false));
         }
@@ -254,7 +264,7 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
     ResultProcessor resultProcessor = new ResultProcessor();
     try {
       resultProcessor.processResult(commandLineArguments.getDb() != null,
-          manifest.getPackageName(), componentToIdMap, AnalysisParameters.v().getAnalysisClasses()
+          packageName, componentToIdMap, AnalysisParameters.v().getAnalysisClasses()
               .size(), writer);
     } catch (IOException | SQLException e) {
       logger.error("Could not process analysis results", e);
@@ -308,12 +318,12 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
     }
   }
 
-  protected void addEntryPointMappingSceneTransformer(ProcessManifest manifest,
+  protected void addEntryPointMappingSceneTransformer(Set<String> entryPointClasses,
       Map<String, Set<String>> entryPointMapping, Map<SootMethod, Set<String>> entryPointMap) {
     String pack = AnalysisParameters.v().useShimple() ? "wstp" : "wjtp";
 
     Transform transform =
-        new Transform(pack + ".epm", new EntryPointMappingSceneTransformer(manifest,
+        new Transform(pack + ".epm", new EntryPointMappingSceneTransformer(entryPointClasses,
             entryPointMapping, entryPointMap));
     if (PackManager.v().getPack(pack).get(pack + ".epm") == null) {
       PackManager.v().getPack(pack).add(transform);

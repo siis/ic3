@@ -86,15 +86,10 @@ public class ResultProcessor {
             + " " + imprecise[2] + " " + bottom[0] + " " + bottom[1] + " " + bottom[2] + " "
             + top[0] + " " + top[1] + " " + top[2] + " " + nonexistent[0] + " " + nonexistent[1]
             + " " + nonexistent[2] + " " + providerArgument + " " + imprecise[4] + " "
-            + preciseFieldValueCount[0] + " " + preciseFieldValueCount[1] + " "
-            + preciseFieldValueCount[2] + " " + partiallyPreciseFieldValueCount[0] + " "
-            + partiallyPreciseFieldValueCount[1] + " " + partiallyPreciseFieldValueCount[2] + " "
-            + impreciseFieldValueCount[0] + " " + impreciseFieldValueCount[1] + " "
-            + impreciseFieldValueCount[2] + " " + PropagationTimers.v().pathValues + " "
-            + PropagationTimers.v().modelParsing.getTime() + " "
-            + Timers.v().mainGeneration.getTime() + " " + Timers.v().entryPointMapping.getTime()
-            + " " + Timers.v().classLoading.getTime() + " "
-            + PropagationTimers.v().problemGeneration.getTime() + " "
+            + PropagationTimers.v().pathValues + " " + PropagationTimers.v().modelParsing.getTime()
+            + " " + Timers.v().mainGeneration.getTime() + " "
+            + Timers.v().entryPointMapping.getTime() + " " + Timers.v().classLoading.getTime()
+            + " " + PropagationTimers.v().problemGeneration.getTime() + " "
             + PropagationTimers.v().ideSolution.getTime() + " "
             + PropagationTimers.v().valueComposition.getTime() + " "
             + PropagationTimers.v().resultGeneration.getTime() + " "

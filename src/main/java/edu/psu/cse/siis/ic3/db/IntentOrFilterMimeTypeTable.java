@@ -20,6 +20,8 @@ package edu.psu.cse.siis.ic3.db;
 
 import java.sql.SQLException;
 
+import edu.psu.cse.siis.coal.Constants;
+
 public abstract class IntentOrFilterMimeTypeTable extends Table {
   private static final String INSERT = "INSERT INTO %s (%s, type, subtype) VALUES (?, ?, ?)";
   private static final String FIND = "SELECT id FROM %s WHERE %s = ? AND type = ? AND subtype = ?";
@@ -30,6 +32,12 @@ public abstract class IntentOrFilterMimeTypeTable extends Table {
   }
 
   public int insert(int intentOrFilterId, String type, String subtype) throws SQLException {
+    if (type == null) {
+      type = Constants.NULL_STRING;
+    }
+    if (subtype == null) {
+      subtype = Constants.NULL_STRING;
+    }
     int id = find(intentOrFilterId, type, subtype);
     if (id != NOT_FOUND) {
       return id;
@@ -41,6 +49,13 @@ public abstract class IntentOrFilterMimeTypeTable extends Table {
     if (insertStatement == null || insertStatement.isClosed()) {
       insertStatement = getConnection().prepareStatement(insertString);
     }
+    if (type == null) {
+      type = Constants.NULL_STRING;
+    }
+    if (subtype == null) {
+      subtype = Constants.NULL_STRING;
+    }
+
     insertStatement.setInt(1, intentOrFilterId);
     insertStatement.setString(2, type);
     insertStatement.setString(3, subtype);
@@ -54,6 +69,13 @@ public abstract class IntentOrFilterMimeTypeTable extends Table {
     if (findStatement == null || findStatement.isClosed()) {
       findStatement = getConnection().prepareStatement(findString);
     }
+    if (type == null) {
+      type = Constants.NULL_STRING;
+    }
+    if (subtype == null) {
+      subtype = Constants.NULL_STRING;
+    }
+
     findStatement.setInt(1, intentOrFilterId);
     findStatement.setString(2, type);
     findStatement.setString(3, subtype);

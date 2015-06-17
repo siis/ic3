@@ -35,7 +35,6 @@ import soot.SceneTransformer;
 import soot.SootClass;
 import soot.SootMethod;
 import soot.Type;
-import soot.jimple.infoflow.android.manifest.ProcessManifest;
 import soot.jimple.infoflow.entryPointCreators.AndroidEntryPointConstants;
 import soot.jimple.toolkits.callgraph.CallGraph;
 import soot.jimple.toolkits.callgraph.Edge;
@@ -48,18 +47,19 @@ public class EntryPointMappingSceneTransformer extends SceneTransformer {
 
   private static SootClass activityClass = null;
   private static SootClass serviceClass = null;
+  private static SootClass gcmBaseIntentServiceClass = null;
   private static SootClass receiverClass = null;
   private static SootClass providerClass = null;
   private static SootClass applicationClass = null;
 
-  private final ProcessManifest manifest;
+  private final Set<String> entryPointClasses;
   private final Map<String, Set<String>> callbackMethods;
   private final Map<SootMethod, Set<String>> entryPointMap;
   private final Set<SootMethod> visitedEntryPoints = new HashSet<>();
 
-  public EntryPointMappingSceneTransformer(ProcessManifest manifest,
+  public EntryPointMappingSceneTransformer(Set<String> entryPointClasses,
       Map<String, Set<String>> callbackMethods, Map<SootMethod, Set<String>> entryPointMap) {
-    this.manifest = manifest;
+    this.entryPointClasses = entryPointClasses;
     this.callbackMethods = callbackMethods;
     this.entryPointMap = entryPointMap;
   }
@@ -71,7 +71,6 @@ public class EntryPointMappingSceneTransformer extends SceneTransformer {
 
     // Set<String> signatures = new HashSet<>();
 
-    Set<String> entryPointClasses = manifest.getEntryPointClasses();
     Map<SootMethod, Set<String>> entryPointMap = this.entryPointMap;
     if (logger.isDebugEnabled()) {
       Set<String> difference = new HashSet<>(this.callbackMethods.keySet());
@@ -91,6 +90,8 @@ public class EntryPointMappingSceneTransformer extends SceneTransformer {
     // lifecycleMethods.addAll(AndroidEntryPointConstants.getServiceLifecycleMethods());
     activityClass = Scene.v().getSootClass(AndroidEntryPointConstants.ACTIVITYCLASS);
     serviceClass = Scene.v().getSootClass(AndroidEntryPointConstants.SERVICECLASS);
+    gcmBaseIntentServiceClass =
+        Scene.v().getSootClass(AndroidEntryPointConstants.GCMBASEINTENTSERVICECLASS);
     receiverClass = Scene.v().getSootClass(AndroidEntryPointConstants.BROADCASTRECEIVERCLASS);
     providerClass = Scene.v().getSootClass(AndroidEntryPointConstants.CONTENTPROVIDERCLASS);
     applicationClass = Scene.v().getSootClass(AndroidEntryPointConstants.APPLICATIONCLASS);
@@ -193,31 +194,33 @@ public class EntryPointMappingSceneTransformer extends SceneTransformer {
 
   private boolean addLifecycleMethods(SootClass entryPointClass,
       List<MethodOrMethodContext> callbacks) {
+    boolean result = true;
     Hierarchy hierarchy = Scene.v().getActiveHierarchy();
+
     if (hierarchy.isClassSubclassOf(entryPointClass, activityClass)) {
       addLifecycleMethodsHelper(entryPointClass,
           AndroidEntryPointConstants.getActivityLifecycleMethods(), callbacks);
-      return true;
+    } else if (hierarchy.isClassSubclassOf(entryPointClass, gcmBaseIntentServiceClass)) {
+      addLifecycleMethodsHelper(entryPointClass,
+          AndroidEntryPointConstants.getGCMIntentServiceMethods(), callbacks);
     } else if (hierarchy.isClassSubclassOf(entryPointClass, serviceClass)) {
       addLifecycleMethodsHelper(entryPointClass,
           AndroidEntryPointConstants.getServiceLifecycleMethods(), callbacks);
-      return true;
     } else if (hierarchy.isClassSubclassOf(entryPointClass, receiverClass)) {
       addLifecycleMethodsHelper(entryPointClass,
           AndroidEntryPointConstants.getBroadcastLifecycleMethods(), callbacks);
-      return true;
     } else if (hierarchy.isClassSubclassOf(entryPointClass, providerClass)) {
       addLifecycleMethodsHelper(entryPointClass,
           AndroidEntryPointConstants.getContentproviderLifecycleMethods(), callbacks);
-      return true;
     } else if (hierarchy.isClassSubclassOf(entryPointClass, applicationClass)) {
       addLifecycleMethodsHelper(entryPointClass,
           AndroidEntryPointConstants.getApplicationLifecycleMethods(), callbacks);
-      return true;
     } else {
       System.err.println("Unknown entry point type: " + entryPointClass);
-      return false;
+      result = false;
     }
+
+    return result;
   }
 
   private void addLifecycleMethodsHelper(SootClass entryPointClass, List<String> lifecycleMethods,
