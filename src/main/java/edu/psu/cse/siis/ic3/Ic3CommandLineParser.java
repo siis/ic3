@@ -19,7 +19,7 @@
 package edu.psu.cse.siis.ic3;
 
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import edu.psu.cse.siis.coal.CommandLineParser;
@@ -32,22 +32,21 @@ public class Ic3CommandLineParser extends CommandLineParser<Ic3CommandLineArgume
       "Copyright (C) 2015 The Pennsylvania State University and the University of Wisconsin\n"
           + "Systems and Internet Infrastructure Security Laboratory\n";
 
-  @SuppressWarnings("static-access")
   @Override
   protected void parseAnalysisSpecificArguments(Options options) {
-    options.addOption(OptionBuilder
-        .withDescription("Path to the manifest file or the .apk of the application.").hasArg()
-        .withArgName(".apk or manifest").isRequired().create("apkormanifest"));
-    options.addOption(OptionBuilder.withDescription("Store entry points to database.")
-        .hasOptionalArg().withArgName("DB properties file").create("db"));
-    options.addOption(OptionBuilder.withDescription("Use SSH to connect to the database.")
-        .hasOptionalArg().withArgName("SSH properties file").create("ssh"));
-    options.addOption(OptionBuilder.withDescription("Local DB port to connect to.").hasArg()
-        .withType(Number.class).withArgName("local DB port").create("localport"));
-    options.addOption(OptionBuilder.withDescription("Destination path for the results.").hasArg()
-        .withArgName("destination path").create("protobuf"));
-    options.addOption(OptionBuilder.withDescription("Specify a sample name.").hasArg()
-        .withArgName("sample name").create("sample"));
+    options.addOption(Option.builder("apkormanifest")
+        .desc("Path to the manifest file or the .apk of the application.").hasArg()
+        .argName(".apk or manifest").required().build());
+    options.addOption(Option.builder("db").desc("Store entry points to database.")
+        .optionalArg(true).argName("DB properties file").build());
+    options.addOption(Option.builder("ssh").desc("Use SSH to connect to the database.")
+        .optionalArg(true).argName("SSH properties file").build());
+    options.addOption(Option.builder("localport").desc("Local DB port to connect to.").hasArg()
+        .type(Number.class).argName("local DB port").build());
+    options.addOption(Option.builder("protobuf").desc("Destination path for the results.").hasArg()
+        .argName("destination path").build());
+    options.addOption(Option.builder("sample").desc("Specify a sample name.").hasArg()
+        .argName("sample name").build());
     options.addOption("computecomponents", false,
         "Compute which components each exit point belongs to.");
     options.addOption("binary", false, "Output a binary protobuf.");
@@ -61,6 +60,7 @@ public class Ic3CommandLineParser extends CommandLineParser<Ic3CommandLineArgume
         + "-apk <path to application .apk> [-computecomponents] "
         + "[-db <path to DB properties file>] [-ssh <path to SSH properties file>] "
         + "[-localport <DB local port>] [-modeledtypesonly] [-output <output directory>] "
-        + "[-protobuf <destination path>] [-binary] [-sample <sample name>]", options);
+        + "[-protobuf <destination path>] [-binary] [-sample <sample name>] "
+        + "[-threadcount <thread count>]", options);
   }
 }

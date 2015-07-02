@@ -286,6 +286,10 @@ public class ProtobufResultProcessor {
 
     Set<String> categories = intentValue.getSetStringFieldValue("categories");
     if (categories != null) {
+      if (categories.contains(null)) {
+        categories.remove(null);
+        categories.add(Constants.NULL_STRING);
+      }
       intentBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.CATEGORY)
           .addAllValue(categories));
     }
@@ -317,6 +321,10 @@ public class ProtobufResultProcessor {
 
     Set<String> extras = intentValue.getSetStringFieldValue("extras");
     if (extras != null) {
+      if (extras.contains(null)) {
+        extras.remove(null);
+        extras.add(Constants.NULL_STRING);
+      }
       intentBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.EXTRA)
           .addAllValue(extras));
     }

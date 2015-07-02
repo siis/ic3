@@ -343,15 +343,23 @@ public class ManifestPullParser {
           filterBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.PRIORITY)
               .addIntValue(filter.getPriority()));
         }
-        if (filter.getActions() != null) {
-          for (String action : filter.getActions()) {
-            filterBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.ACTION)
-                .addValue(action));
+        Set<String> value = filter.getActions();
+        if (value != null) {
+          if (value.contains(null)) {
+            value.remove(null);
+            value.add(edu.psu.cse.siis.coal.Constants.NULL_STRING);
           }
+          filterBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.ACTION)
+              .addAllValue(value));
         }
-        if (filter.getCategories() != null) {
+        value = filter.getCategories();
+        if (value != null) {
+          if (value.contains(null)) {
+            value.remove(null);
+            value.add(edu.psu.cse.siis.coal.Constants.NULL_STRING);
+          }
           filterBuilder.addAttributes(Attribute.newBuilder().setKind(AttributeKind.CATEGORY)
-              .addAllValue(filter.getCategories()));
+              .addAllValue(value));
         }
         if (filter.getData() != null) {
           for (ManifestData data : filter.getData()) {
