@@ -26,8 +26,8 @@ import edu.psu.cse.siis.coal.CommandLineArguments;
  * Command line arguments for IC3.
  */
 public class Ic3CommandLineArguments extends CommandLineArguments {
-  private static final String DEFAULT_SSH_PROPERTIES_PATH = "/res/db/ssh.properties";
-  private static final String DEFAULT_DATABASE_PROPERTIES_PATH = "/res/db/cc.properties";
+  private static final String DEFAULT_SSH_PROPERTIES_PATH = "/db/ssh.properties";
+  private static final String DEFAULT_DATABASE_PROPERTIES_PATH = "/db/cc.properties";
   private static final int DEFAULT_LOCAL_PORT = 3369;
   private static final String DEFAULT_COMPILED_MODEL_PATH = "/res/icc.cmodel";
   private static final String DEFAULT_DB_NAME = "cc";

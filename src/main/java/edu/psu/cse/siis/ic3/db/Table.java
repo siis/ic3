@@ -89,7 +89,7 @@ public abstract class Table {
     }
 
     Properties sshProperties = new Properties();
-    if (sshPropertiesPath.startsWith("/res/")) {
+    if (sshPropertiesPath.startsWith("/db/")) {
       sshProperties.load(Table.class.getResourceAsStream(sshPropertiesPath));
     } else {
       sshProperties.load(new FileReader(sshPropertiesPath));
@@ -132,7 +132,7 @@ public abstract class Table {
     Properties properties = new Properties();
 
     try {
-      if (dbPropertiesPath.startsWith("/res")) {
+      if (dbPropertiesPath.startsWith("/db/")) {
         properties.load(SQLConnection.class.getResourceAsStream(dbPropertiesPath));
       } else {
         properties.load(new FileReader(dbPropertiesPath));
