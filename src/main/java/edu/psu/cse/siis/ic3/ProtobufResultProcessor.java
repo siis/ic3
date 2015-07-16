@@ -46,6 +46,8 @@ import edu.psu.cse.siis.ic3.Ic3Data.Application.Component.ComponentKind;
 import edu.psu.cse.siis.ic3.Ic3Data.Application.Component.ExitPoint;
 import edu.psu.cse.siis.ic3.Ic3Data.Application.Component.ExitPoint.Intent;
 import edu.psu.cse.siis.ic3.Ic3Data.Application.Component.ExitPoint.Uri;
+import edu.psu.cse.siis.ic3.Ic3Data.Application.Component.Extra;
+import edu.psu.cse.siis.ic3.Ic3Data.Application.Component.Instruction;
 import edu.psu.cse.siis.ic3.Ic3Data.Attribute;
 import edu.psu.cse.siis.ic3.Ic3Data.AttributeKind;
 import edu.psu.cse.siis.ic3.manifest.ManifestComponent;
@@ -134,7 +136,7 @@ public class ProtobufResultProcessor {
   @SuppressWarnings("unchecked")
   private void writeResultToProtobuf(Result result, Ic3Data.Application.Builder ic3Builder,
       Map<String, Component.Builder> componentNameToBuilderMap) {
-    Map<String, Set<String>> componentToExtrasMap = new HashMap<>();
+    Map<String, Set<Extra>> componentToExtrasMap = new HashMap<>();
     Map<String, ManifestComponent> dynamicReceivers = new HashMap<>();
     Map<SootMethod, Set<String>> entryPointMap = ((Ic3Result) result).getEntryPointMap();
 
@@ -145,7 +147,7 @@ public class ProtobufResultProcessor {
 
       if (arguments != null) {
         SootMethod method = AnalysisParameters.v().getIcfg().getMethodOf(unit);
-        int unitId = getIdForUnit(unit, method);
+        Instruction.Builder instructionBuilder = unitToInstructionBuilder(method, unit);
         Map<String, Object> valueMap = new HashMap<>(arguments.length);
         Map<Integer, Object> argnumToValueMap = entry.getValue();
 
@@ -154,31 +156,29 @@ public class ProtobufResultProcessor {
               argnumToValueMap.get(argument.getArgnum()[0]));
         }
 
-        String className = method.getDeclaringClass().getName();
-        String methodSignature = method.getSignature();
         if (valueMap.containsKey("activity")) {
-          insertProtobufExitPoint(className, methodSignature, unitId,
+          insertProtobufExitPoint(instructionBuilder,
               (BasePropagationValue) valueMap.get("activity"), ComponentKind.ACTIVITY, null, null,
               entryPointMap.get(method), componentNameToBuilderMap);
         } else if (valueMap.containsKey("service")) {
-          insertProtobufExitPoint(className, methodSignature, unitId,
+          insertProtobufExitPoint(instructionBuilder,
               (BasePropagationValue) valueMap.get("service"), ComponentKind.SERVICE, null, null,
               entryPointMap.get(method), componentNameToBuilderMap);
         } else if (valueMap.containsKey("receiver")) {
-          insertProtobufExitPoint(className, methodSignature, unitId,
+          insertProtobufExitPoint(instructionBuilder,
               (BasePropagationValue) valueMap.get("receiver"), ComponentKind.RECEIVER,
               (Set<String>) valueMap.get("permission"), null, entryPointMap.get(method),
               componentNameToBuilderMap);
         } else if (valueMap.containsKey("intentFilter")) {
           insertDynamicReceiver(dynamicReceivers, (Set<String>) valueMap.get("permission"),
               (Set<String>) valueMap.get("receiverType"),
-              (BasePropagationValue) valueMap.get("intentFilter"));
+              (BasePropagationValue) valueMap.get("intentFilter"), method, unit);
         } else if (valueMap.containsKey("provider")) {
-          insertProtobufExitPoint(className, methodSignature, unitId,
+          insertProtobufExitPoint(instructionBuilder,
               (BasePropagationValue) valueMap.get("provider"), ComponentKind.PROVIDER, null, null,
               entryPointMap.get(method), componentNameToBuilderMap);
         } else if (valueMap.containsKey("authority")) {
-          insertProtobufExitPoint(className, methodSignature, unitId,
+          insertProtobufExitPoint(instructionBuilder,
               getUriValueForAuthorities((Set<String>) valueMap.get("authority")),
               ComponentKind.PROVIDER, null, null, entryPointMap.get(method),
               componentNameToBuilderMap);
@@ -191,33 +191,38 @@ public class ProtobufResultProcessor {
                   : null;
           Set<String> permissions = (Set<String>) valueMap.get("permission");
           if (targetType != null) {
-            insertProtobufExitPoint(className, methodSignature, unitId, baseCollectingValue,
+            insertProtobufExitPoint(instructionBuilder, baseCollectingValue,
                 stringToComponentKind(targetType), permissions, null, entryPointMap.get(method),
                 componentNameToBuilderMap);
           } else {
             for (ComponentKind target : Arrays.asList(ComponentKind.ACTIVITY,
                 ComponentKind.RECEIVER, ComponentKind.SERVICE)) {
-              insertProtobufExitPoint(className, methodSignature, unitId, baseCollectingValue,
-                  target, null, null, entryPointMap.get(method), componentNameToBuilderMap);
+              insertProtobufExitPoint(instructionBuilder, baseCollectingValue, target, null, null,
+                  entryPointMap.get(method), componentNameToBuilderMap);
             }
           }
         } else if (valueMap.containsKey("componentExtra")) {
           Set<String> extras = (Set<String>) valueMap.get("componentExtra");
           if (extras != null) {
             for (String component : entryPointMap.get(method)) {
-              Set<String> existingExtras = componentToExtrasMap.get(component);
+              Set<Extra> existingExtras = componentToExtrasMap.get(component);
               if (existingExtras == null) {
                 existingExtras = new HashSet<>();
                 componentToExtrasMap.put(component, existingExtras);
               }
-              existingExtras.addAll(extras);
+              for (String extra : extras) {
+                Extra.Builder extraBuilder = Extra.newBuilder();
+                extraBuilder.setExtra(extra);
+                extraBuilder.setInstruction(instructionBuilder);
+                existingExtras.add(extraBuilder.build());
+              }
             }
           }
         }
       }
     }
 
-    for (Map.Entry<String, Set<String>> entry : componentToExtrasMap.entrySet()) {
+    for (Map.Entry<String, Set<Extra>> entry : componentToExtrasMap.entrySet()) {
       componentNameToBuilderMap.get(entry.getKey()).addAllExtras(entry.getValue());
     }
 
@@ -226,19 +231,32 @@ public class ProtobufResultProcessor {
     }
 
     for (ManifestComponent manifestComponent : dynamicReceivers.values()) {
-      ic3Builder.addComponents(ManifestPullParser.makeProtobufComponentBuilder(manifestComponent,
-          ComponentKind.DYNAMIC_RECEIVER));
+      Component.Builder componentBuilder =
+          ManifestPullParser.makeProtobufComponentBuilder(manifestComponent,
+              ComponentKind.DYNAMIC_RECEIVER);
+      componentBuilder.setRegistrationInstruction(unitToInstructionBuilder(
+          manifestComponent.getRegistrationMethod(), manifestComponent.getRegistrationUnit()));
+      ic3Builder.addComponents(componentBuilder);
     }
   }
 
-  private void insertProtobufExitPoint(String className, String method, int instruction,
+  private Instruction.Builder unitToInstructionBuilder(SootMethod method, Unit unit) {
+    Instruction.Builder builder = Instruction.newBuilder();
+    builder.setClassName(method.getDeclaringClass().getName());
+    builder.setMethod(method.getSignature());
+    builder.setStatement(unit.toString());
+    builder.setId(getIdForUnit(unit, method));
+
+    return builder;
+  }
+
+  private void insertProtobufExitPoint(Instruction.Builder instructionBuilder,
       BasePropagationValue intentValue, ComponentKind componentKind, Set<String> intentPermissions,
       Integer missingIntents, Set<String> exitPointComponents,
       Map<String, Component.Builder> componentNameToBuilderMap) {
     for (String exitPointComponent : exitPointComponents) {
       ExitPoint.Builder exitPointBuilder = ExitPoint.newBuilder();
-      exitPointBuilder.setClassName(className).setMethod(method).setInstruction(instruction)
-          .setKind(componentKind);
+      exitPointBuilder.setInstruction(instructionBuilder).setKind(componentKind);
       PropagationValue collectingValue = null;
       if (intentValue == null || intentValue instanceof TopPropagationValue
           || intentValue instanceof BottomPropagationValue) {
@@ -384,20 +402,23 @@ public class ProtobufResultProcessor {
   }
 
   private void insertDynamicReceiver(Map<String, ManifestComponent> dynamicReceivers,
-      Set<String> permissions, Set<String> receiverTypes, BasePropagationValue intentFilters) {
+      Set<String> permissions, Set<String> receiverTypes, BasePropagationValue intentFilters,
+      SootMethod method, Unit unit) {
     if (permissions == null) {
       permissions = Collections.singleton(null);
     }
 
     for (String receiverType : receiverTypes) {
       for (String permission : permissions) {
-        insertDynamicReceiverHelper(dynamicReceivers, permission, receiverType, intentFilters);
+        insertDynamicReceiverHelper(dynamicReceivers, permission, receiverType, intentFilters,
+            method, unit);
       }
     }
   }
 
   private void insertDynamicReceiverHelper(Map<String, ManifestComponent> dynamicReceivers,
-      String permission, String receiverType, BasePropagationValue intentFilters) {
+      String permission, String receiverType, BasePropagationValue intentFilters,
+      SootMethod method, Unit unit) {
     Integer missingIntentFilters;
     Set<ManifestIntentFilter> manifestIntentFilters;
 
@@ -429,7 +450,7 @@ public class ProtobufResultProcessor {
       manifestComponent =
           new ManifestComponent(
               edu.psu.cse.siis.ic3.db.Constants.ComponentShortType.DYNAMIC_RECEIVER, receiverType,
-              true, true, permission, null, missingIntentFilters);
+              true, true, permission, null, missingIntentFilters, method, unit);
       dynamicReceivers.put(receiverType, manifestComponent);
     }
 

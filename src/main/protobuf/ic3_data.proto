@@ -22,31 +22,31 @@ enum AttributeKind {
 }
 
 message Attribute {
-  required AttributeKind kind = 1;
+  optional AttributeKind kind = 1;
   repeated string value = 2;
   repeated int32 int_value = 3;
 }
 
 message Application {
-  required string name = 1;
-  required uint32 version = 2;
+  optional string name = 1;
+  optional uint32 version = 2;
 
   message Permission {
-    required string name = 1;
+    optional string name = 1;
     enum Level {
       NORMAL = 0;
       DANGEROUS = 1;
       SIGNATURE = 2;
       SIGNATURE_OR_SYSTEM = 3;
     }
-    required Level level = 2;
+    optional Level level = 2;
   }
 
   repeated Permission permissions = 3;
   repeated string used_permissions = 4;
 
   message Component {
-    required string name = 1;
+    optional string name = 1;
 
     enum ComponentKind {
       ACTIVITY = 0;
@@ -56,11 +56,18 @@ message Application {
       PROVIDER = 4;
     }
 
-    required ComponentKind kind = 2;
-    required bool exported = 3;
+    optional ComponentKind kind = 2;
+    optional bool exported = 3;
     optional string permission = 4;
     optional uint32 missing = 5;
-    repeated string extras = 6;
+
+    message Extra {
+      optional string extra = 1;
+      optional Instruction instruction = 2;
+    }
+
+    repeated Extra extras = 6;
+
     optional string alias_target = 7;
     optional bool grant_uri_permissions = 8;
     optional string read_permission = 9;
@@ -73,28 +80,35 @@ message Application {
 
     repeated IntentFilter intent_filters = 12;
 
+    message Instruction {
+      optional string statement = 1;
+      optional string class_name = 2;
+      optional string method = 3;
+      optional uint32 id = 4;
+    }
+
     message ExitPoint {
-      required string class_name = 1;
-      required string method = 2;
-      required uint32 instruction = 3;
-      required ComponentKind kind = 4;
-      optional uint32 missing = 5;
+      optional Instruction instruction = 1;
+      optional ComponentKind kind = 2;
+      optional uint32 missing = 3;
 
       message Intent {
         repeated Attribute attributes = 1;
         optional string permission = 2;
       }
 
-      repeated Intent intents = 6;
+      repeated Intent intents = 4;
 
       message Uri {
         repeated Attribute attributes = 1;
       }
 
-      repeated Uri uris = 7;
+      repeated Uri uris = 5;
     }
 
     repeated ExitPoint exit_points = 13;
+
+    optional Instruction registration_instruction = 14;
   }
 
   repeated Component components = 5;

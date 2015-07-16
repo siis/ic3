@@ -666,7 +666,7 @@ public class ManifestPullParser {
     }
     currentComponent =
         new ManifestComponent(componentType, canonicalizeComponentName(name), isExported,
-            foundExported, permission, targetActivity, null);
+            foundExported, permission, targetActivity, null, null, null);
 
     return true;
   }
