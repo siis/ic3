@@ -115,13 +115,7 @@ public abstract class Table {
     if (sshPropertiesPath != null) {
       try {
         makeSshTunnel();
-      } catch (NumberFormatException e) {
-        e.printStackTrace();
-        return;
-      } catch (IOException e) {
-        e.printStackTrace();
-        return;
-      } catch (JSchException e) {
+      } catch (NumberFormatException | IOException | JSchException e) {
         e.printStackTrace();
         return;
       }
@@ -150,13 +144,7 @@ public abstract class Table {
 
     try {
       Class.forName("com.mysql.jdbc.Driver").newInstance();
-    } catch (InstantiationException e) {
-      e.printStackTrace();
-      return;
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-      return;
-    } catch (ClassNotFoundException e) {
+    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
       e.printStackTrace();
       return;
     }
