@@ -109,8 +109,8 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
     prepareManifestFile(commandLineArguments);
 
     if (commandLineArguments.getDb() != null) {
-      SQLConnection.init(commandLineArguments.getDb(), commandLineArguments.getSsh(),
-          commandLineArguments.getDbLocalPort());
+      SQLConnection.init(commandLineArguments.getDbName(), commandLineArguments.getDb(),
+          commandLineArguments.getSsh(), commandLineArguments.getDbLocalPort());
       componentToIdMap = ((ManifestPullParser) manifest).writeToDb(false);
     }
 

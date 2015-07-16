@@ -55,13 +55,14 @@ public abstract class Table {
   protected PreparedStatement findStatement = null;
   private PreparedStatement selectLastInsertId = null;
 
-  public static void init(String dbPropertiesPath, String sshPropertiesPath, int localPort) {
+  public static void init(String dbName, String dbPropertiesPath, String sshPropertiesPath,
+      int localPort) {
     Table.sshPropertiesPath = sshPropertiesPath;
     Table.dbPropertiesPath = dbPropertiesPath;
     Table.localPort = localPort;
     url =
-        sshPropertiesPath != null ? "jdbc:mysql://localhost:" + localPort + "/cc"
-            : "jdbc:mysql://localhost/cc";
+        sshPropertiesPath != null ? "jdbc:mysql://localhost:" + localPort + "/" + dbName
+            : "jdbc:mysql://localhost/" + dbName;
   }
 
   public static Connection getConnection() {
