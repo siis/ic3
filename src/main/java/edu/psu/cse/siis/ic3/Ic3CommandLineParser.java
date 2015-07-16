@@ -44,6 +44,8 @@ public class Ic3CommandLineParser extends CommandLineParser<Ic3CommandLineArgume
         .hasOptionalArg().withArgName("SSH properties file").create("ssh"));
     options.addOption(OptionBuilder.withDescription("Local DB port to connect to.").hasArg()
         .withType(Number.class).withArgName("local DB port").create("localport"));
+    options.addOption(OptionBuilder.withDescription("DB name to connect to.").hasArg()
+        .withType(Number.class).withArgName("DB name").create("dbname"));
     options.addOption("computecomponents", false,
         "Compute which components each exit point belongs to.");
   }

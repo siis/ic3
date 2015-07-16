@@ -62,8 +62,9 @@ public class SQLConnection {
   protected static ProviderAuthorityTable providerAuthorityTable = new ProviderAuthorityTable();
   protected static int appId = Constants.NOT_FOUND;
 
-  public static void init(String dbPropertiesPath, String sshPropertiesPath, int localDbPort) {
-    Table.init(dbPropertiesPath, sshPropertiesPath, localDbPort);
+  public static void init(String dbName, String dbPropertiesPath, String sshPropertiesPath,
+      int localDbPort) {
+    Table.init(dbName, dbPropertiesPath, sshPropertiesPath, localDbPort);
   }
 
   public static void closeConnection() {
