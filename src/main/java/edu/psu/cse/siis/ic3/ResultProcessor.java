@@ -86,10 +86,11 @@ public class ResultProcessor {
             + " " + imprecise[2] + " " + bottom[0] + " " + bottom[1] + " " + bottom[2] + " "
             + top[0] + " " + top[1] + " " + top[2] + " " + nonexistent[0] + " " + nonexistent[1]
             + " " + nonexistent[2] + " " + providerArgument + " " + imprecise[4] + " "
-            + PropagationTimers.v().pathValues + " " + PropagationTimers.v().modelParsing.getTime()
-            + " " + Timers.v().mainGeneration.getTime() + " "
-            + Timers.v().entryPointMapping.getTime() + " " + Timers.v().classLoading.getTime()
-            + " " + PropagationTimers.v().problemGeneration.getTime() + " "
+            + PropagationTimers.v().pathValues + " " + PropagationTimers.v().separatePathValues
+            + " " + PropagationTimers.v().modelParsing.getTime() + " "
+            + Timers.v().mainGeneration.getTime() + " " + Timers.v().entryPointMapping.getTime()
+            + " " + Timers.v().classLoading.getTime() + " "
+            + PropagationTimers.v().problemGeneration.getTime() + " "
             + PropagationTimers.v().ideSolution.getTime() + " "
             + PropagationTimers.v().valueComposition.getTime() + " "
             + PropagationTimers.v().resultGeneration.getTime() + " "
@@ -332,16 +333,32 @@ public class ResultProcessor {
         } else if (value2 instanceof BottomPropagationValue) {
           bottom = true;
         } else if (value2 instanceof PropagationValue) {
+          System.out.println(value2);
           Set<PathValue> pathValues = ((PropagationValue) value2).getPathValues();
           PropagationTimers.v().pathValues += pathValues.size();
+
+          // This keeps track of all the fields that are defined across all paths.
+          Set<String> definedFields = new HashSet<>();
+
+          for (PathValue pathValue : pathValues) {
+            definedFields.addAll(pathValue.getFieldMap().keySet());
+          }
+
+          Map<String, Set<FieldValue>> separateFieldValues = new HashMap<>();
 
           for (PathValue branchValue : pathValues) {
 
             intentWithUri = intentWithUri || isIntentWithUri(branchValue.getFieldMap());
 
+            Set<String> definedFieldsInPath = new HashSet<>();
+
             for (Map.Entry<String, FieldValue> entry : branchValue.getFieldMap().entrySet()) {
               String fieldName = entry.getKey();
               FieldValue fieldValue = entry.getValue();
+
+              addValueToSetMap(fieldName, fieldValue, separateFieldValues);
+
+              definedFieldsInPath.add(fieldName);
 
               if (fieldValue instanceof TopFieldValue) {
                 if (nonLinkingFieldNames.contains(fieldName)) {
@@ -385,7 +402,24 @@ public class ResultProcessor {
                 }
               }
             }
+
+            // If some field is undefined in some path, then we need to keep track of a null value
+            // for that field.
+            Set<String> undefinedFieldForPath = new HashSet<>(definedFields);
+            undefinedFieldForPath.removeAll(definedFieldsInPath);
+
+            for (String fieldName : undefinedFieldForPath) {
+
+              addValueToSetMap(fieldName, null, separateFieldValues);
+            }
           }
+
+          int separateCount = 1;
+          for (Set<FieldValue> values : separateFieldValues.values()) {
+            separateCount *= values.size();
+          }
+          System.out.println(separateCount);
+          PropagationTimers.v().separatePathValues += separateCount;
         }
       }
 
@@ -430,6 +464,16 @@ public class ResultProcessor {
         }
       }
     }
+  }
+
+  private void addValueToSetMap(String key, FieldValue value, Map<String, Set<FieldValue>> map) {
+    Set<FieldValue> separateValuesForField = map.get(key);
+    if (separateValuesForField == null) {
+      separateValuesForField = new HashSet<>();
+      map.put(key, separateValuesForField);
+    }
+
+    separateValuesForField.add(value);
   }
 
   private boolean isIntentWithUri(Map<String, FieldValue> fieldMap) {

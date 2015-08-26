@@ -224,7 +224,7 @@ public class ManifestPullParser {
 
   /**
    * Parse the manifest file.
-   *
+   * 
    * @param reader Input if text XML.
    * @param is Input if binary XML.
    * @throws IOException
@@ -312,10 +312,10 @@ public class ManifestPullParser {
         }
         String readPermission = provider.getReadPermission();
         String writePermission = provider.getWritePermission();
-        if (!readPermission.equals("")) {
+        if (readPermission != null && !readPermission.equals("")) {
           out.append("      read permission: " + readPermission + "\n");
         }
-        if (!writePermission.equals("")) {
+        if (writePermission != null && !writePermission.equals("")) {
           out.append("      write permission: " + writePermission + "\n");
         }
       }
@@ -574,10 +574,10 @@ public class ManifestPullParser {
 
   /**
    * Transform the protection level to something appropriate for the database.
-   *
+   * 
    * The protection level is stored in two different ways. In a binary manifest, it is an integer.
    * In a text manifest, it is the string designation of the protection level.
-   *
+   * 
    * @param protectionLevel The protection level found in the manifest.
    * @return A string representation for the protection level appropriate for the database.
    */
