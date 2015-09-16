@@ -57,6 +57,7 @@ import edu.psu.cse.siis.coal.PropagationSceneTransformer;
 import edu.psu.cse.siis.coal.PropagationSceneTransformerFilePrinter;
 import edu.psu.cse.siis.coal.SymbolFilter;
 import edu.psu.cse.siis.coal.arguments.ArgumentValueManager;
+import edu.psu.cse.siis.coal.arguments.MethodReturnValueManager;
 import edu.psu.cse.siis.coal.field.transformers.FieldTransformerManager;
 import edu.psu.cse.siis.ic3.db.SQLConnection;
 import edu.psu.cse.siis.ic3.manifest.ManifestPullParser;
@@ -105,6 +106,7 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
 
   @Override
   protected void registerMethodReturnValueAnalyses(Ic3CommandLineArguments commandLineArguments) {
+    MethodReturnValueManager.v().registerDefaultMethodReturnValueAnalyses();
   }
 
   @Override
