@@ -272,6 +272,9 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
   @Override
   protected void processResults(Ic3CommandLineArguments commandLineArguments)
       throws FatalAnalysisException {
+    System.out.println("\n*****Manifest*****");
+    System.out.println(detailedManifest.toString());
+
     if (commandLineArguments.getProtobufDestination() != null) {
       ProtobufResultProcessor resultProcessor = new ProtobufResultProcessor();
       try {
