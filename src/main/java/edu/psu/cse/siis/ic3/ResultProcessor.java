@@ -150,7 +150,7 @@ public class ResultProcessor {
         } else if (valueMap.containsKey("intentFilter")) {
           insertDynamicReceiver((Set<String>) valueMap.get("permission"),
               (Set<String>) valueMap.get("receiverType"),
-              (BasePropagationValue) valueMap.get("intentFilter"));
+              (BasePropagationValue) valueMap.get("intentFilter"), method, unit);
         } else if (valueMap.containsKey("provider")) {
           DbConnection.insertIntentAtExitPoint(className, methodSignature, unitId,
               (BasePropagationValue) valueMap.get("provider"),
@@ -189,20 +189,20 @@ public class ResultProcessor {
   }
 
   private void insertDynamicReceiver(Set<String> permissions, Set<String> receiverTypes,
-      BasePropagationValue intentFilters) throws SQLException {
+      BasePropagationValue intentFilters, SootMethod method, Unit unit) throws SQLException {
     if (permissions == null) {
       permissions = Collections.singleton(null);
     }
 
     for (String receiverType : receiverTypes) {
       for (String permission : permissions) {
-        insertDynamicReceiverHelper(permission, receiverType, intentFilters);
+        insertDynamicReceiverHelper(permission, receiverType, intentFilters, method, unit);
       }
     }
   }
 
   private void insertDynamicReceiverHelper(String permission, String receiverType,
-      BasePropagationValue intentFilters) throws SQLException {
+      BasePropagationValue intentFilters, SootMethod method, Unit unit) throws SQLException {
     Integer missingIntentFilters;
     Set<ManifestIntentFilter> manifestIntentFilters;
     if (intentFilters == null || intentFilters instanceof TopPropagationValue
@@ -229,7 +229,7 @@ public class ResultProcessor {
 
     ManifestComponent manifestComponent =
         new ManifestComponent(edu.psu.cse.siis.ic3.db.Constants.ComponentShortType.RECEIVER,
-            receiverType, true, true, permission, null, missingIntentFilters);
+            receiverType, true, true, permission, null, missingIntentFilters, method, unit);
     manifestComponent.setIntentFilters(manifestIntentFilters);
     SQLConnection.insertIntentFilters(Collections.singletonList(manifestComponent));
   }
@@ -333,7 +333,7 @@ public class ResultProcessor {
         } else if (value2 instanceof BottomPropagationValue) {
           bottom = true;
         } else if (value2 instanceof PropagationValue) {
-          System.out.println(value2);
+          // System.out.println(value2);
           Set<PathValue> pathValues = ((PropagationValue) value2).getPathValues();
           PropagationTimers.v().pathValues += pathValues.size();
 
@@ -418,7 +418,7 @@ public class ResultProcessor {
           for (Set<FieldValue> values : separateFieldValues.values()) {
             separateCount *= values.size();
           }
-          System.out.println(separateCount);
+          // System.out.println(separateCount);
           PropagationTimers.v().separatePathValues += separateCount;
         }
       }

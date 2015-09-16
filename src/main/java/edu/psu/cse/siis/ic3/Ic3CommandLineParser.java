@@ -43,10 +43,15 @@ public class Ic3CommandLineParser extends CommandLineParser<Ic3CommandLineArgume
         .optionalArg(true).argName("SSH properties file").build());
     options.addOption(Option.builder("localport").desc("Local DB port to connect to.").hasArg()
         .type(Number.class).argName("local DB port").build());
+    options.addOption(Option.builder("protobuf").desc("Destination path for the results.").hasArg()
+        .argName("destination path").build());
+    options.addOption(Option.builder("sample").desc("Specify a sample name.").hasArg()
+        .argName("sample name").build());
     options.addOption(Option.builder("dbname").desc("DB name to connect to.").hasArg()
         .type(Number.class).argName("DB name").build());
     options.addOption("computecomponents", false,
         "Compute which components each exit point belongs to.");
+    options.addOption("binary", false, "Output a binary protobuf.");
   }
 
   @Override
@@ -56,6 +61,8 @@ public class Ic3CommandLineParser extends CommandLineParser<Ic3CommandLineArgume
     formatter.printHelp("ic3 -input <Android directory> -classpath <classpath> "
         + "-apk <path to application .apk> [-computecomponents] "
         + "[-db <path to DB properties file>] [-ssh <path to SSH properties file>] "
-        + "[-localport <DB local port>] [-modeledtypesonly] [-output <output directory>]", options);
+        + "[-localport <DB local port>] [-modeledtypesonly] [-output <output directory>] "
+        + "[-protobuf <destination path>] [-binary] [-sample <sample name>] "
+        + "[-threadcount <thread count>]", options);
   }
 }

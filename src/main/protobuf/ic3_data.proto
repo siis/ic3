@@ -1,0 +1,134 @@
+// Copyright (C) 2015 The Pennsylvania State University and the University of Wisconsin
+// Systems and Internet Infrastructure Security Laboratory
+//
+// Author: Damien Octeau
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+syntax = "proto2";
+
+package edu.psu.cse.siis.ic3;
+
+enum AttributeKind {
+  ACTION = 0;
+  CATEGORY = 1;
+  PACKAGE = 2;
+  CLASS = 3;
+  TYPE = 4;
+  URI = 5;
+  SCHEME = 6;
+  EXTRA = 7;
+  AUTHORITY = 8;
+  HOST = 9;
+  PATH = 10;
+  PORT = 11;
+  SSP = 12;
+  QUERY = 13;
+  FLAG = 14;
+  PRIORITY = 15;
+}
+
+message Attribute {
+  optional AttributeKind kind = 1;
+  repeated string value = 2;
+  repeated int32 int_value = 3;
+}
+
+message Application {
+  optional string name = 1;
+  optional uint32 version = 2;
+
+  message Permission {
+    optional string name = 1;
+    enum Level {
+      NORMAL = 0;
+      DANGEROUS = 1;
+      SIGNATURE = 2;
+      SIGNATURE_OR_SYSTEM = 3;
+    }
+    optional Level level = 2;
+  }
+
+  repeated Permission permissions = 3;
+  repeated string used_permissions = 4;
+
+  message Component {
+    optional string name = 1;
+
+    enum ComponentKind {
+      ACTIVITY = 0;
+      SERVICE = 1;
+      RECEIVER = 2;
+      DYNAMIC_RECEIVER = 3;
+      PROVIDER = 4;
+    }
+
+    optional ComponentKind kind = 2;
+    optional bool exported = 3;
+    optional string permission = 4;
+    optional uint32 missing = 5;
+
+    message Extra {
+      optional string extra = 1;
+      optional Instruction instruction = 2;
+    }
+
+    repeated Extra extras = 6;
+
+    optional string alias_target = 7;
+    optional bool grant_uri_permissions = 8;
+    optional string read_permission = 9;
+    optional string write_permission = 10;
+    repeated string authorities = 11;
+
+    message IntentFilter {
+      repeated Attribute attributes = 1;
+    }
+
+    repeated IntentFilter intent_filters = 12;
+
+    message Instruction {
+      optional string statement = 1;
+      optional string class_name = 2;
+      optional string method = 3;
+      optional uint32 id = 4;
+    }
+
+    message ExitPoint {
+      optional Instruction instruction = 1;
+      optional ComponentKind kind = 2;
+      optional uint32 missing = 3;
+
+      message Intent {
+        repeated Attribute attributes = 1;
+        optional string permission = 2;
+      }
+
+      repeated Intent intents = 4;
+
+      message Uri {
+        repeated Attribute attributes = 1;
+      }
+
+      repeated Uri uris = 5;
+    }
+
+    repeated ExitPoint exit_points = 13;
+
+    optional Instruction registration_instruction = 14;
+  }
+
+  repeated Component components = 5;
+  optional int64 analysis_start = 6;
+  optional int64 analysis_end = 7;
+  optional string sample = 8;
+}

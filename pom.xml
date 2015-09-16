@@ -121,6 +121,30 @@
           </dependency>
         </dependencies>
       </plugin>
+      <plugin>
+        <groupId>com.github.os72</groupId>
+        <artifactId>protoc-jar-maven-plugin</artifactId>
+        <version>2.5.0.1</version> <!-- for protobuf 2.5.0 -->
+        <!-- <version>2.4.1.1</version> --> <!-- for protobuf 2.4.1 -->
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <addSources>main</addSources>
+              <outputDirectory>target/generated-sources</outputDirectory>
+              <includeDirectories>
+                <include>src/main</include>
+              </includeDirectories>
+              <inputDirectories>
+                <include>src/main/protobuf</include>
+              </inputDirectories>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
 
     <pluginManagement>
@@ -328,6 +352,11 @@
       <groupId>infoflow-android</groupId>
       <artifactId>infoflow-android</artifactId>
       <version>20150607</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>2.5.0</version>
     </dependency>
   </dependencies>
 </project>

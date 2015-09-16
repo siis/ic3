@@ -21,6 +21,9 @@ package edu.psu.cse.siis.ic3.manifest;
 import java.util.HashSet;
 import java.util.Set;
 
+import soot.SootMethod;
+import soot.Unit;
+
 public class ManifestComponent {
   private final String name;
   private boolean exported;
@@ -31,9 +34,12 @@ public class ManifestComponent {
   // Target activity.
   private final String target;
   private final Integer missingIntentFilters;
+  private final SootMethod registrationMethod;
+  private final Unit registrationUnit;
 
   public ManifestComponent(String type, String name, boolean exported, boolean foundExported,
-      String permission, String target, Integer missingIntentFilters) {
+      String permission, String target, Integer missingIntentFilters,
+      SootMethod registrationMethod, Unit registrationUnit) {
     this.type = type;
     this.exported = exported;
     this.foundExported = foundExported;
@@ -41,6 +47,8 @@ public class ManifestComponent {
     this.permission = permission;
     this.target = target;
     this.missingIntentFilters = missingIntentFilters;
+    this.registrationMethod = registrationMethod;
+    this.registrationUnit = registrationUnit;
   }
 
   /**
@@ -69,6 +77,14 @@ public class ManifestComponent {
    */
   public Set<ManifestIntentFilter> getIntentFilters() {
     return intentFilters;
+  }
+
+  public SootMethod getRegistrationMethod() {
+    return registrationMethod;
+  }
+
+  public Unit getRegistrationUnit() {
+    return registrationUnit;
   }
 
   /**

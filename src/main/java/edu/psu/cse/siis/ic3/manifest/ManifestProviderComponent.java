@@ -30,7 +30,7 @@ public class ManifestProviderComponent extends ManifestComponent {
   ManifestProviderComponent(String type, String name, boolean exported, boolean foundExported,
       String readPermission, String writePermission, Set<String> authorities,
       boolean grantUriPermissions) {
-    super(type, name, exported, foundExported, "", null, null);
+    super(type, name, exported, foundExported, "", null, null, null, null);
     this.readPermission = readPermission;
     this.writePermission = writePermission;
     this.authorities = authorities;

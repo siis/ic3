@@ -35,9 +35,13 @@ public class Ic3CommandLineArguments extends CommandLineArguments {
   private String manifest;
   private String db;
   private String ssh;
+  private String iccStudy;
   private int dbLocalPort = DEFAULT_LOCAL_PORT;
   private boolean computeComponents;
   private String dbName;
+  private String protobufDestination;
+  private boolean binary;
+  private String sample;
 
   public String getDbName() {
     return dbName != null ? dbName : DEFAULT_DB_NAME;
@@ -71,6 +75,10 @@ public class Ic3CommandLineArguments extends CommandLineArguments {
     return ssh;
   }
 
+  public String getIccStudy() {
+    return iccStudy;
+  }
+
   /**
    * Gets the local port to which the database connection should be done.
    * 
@@ -91,7 +99,34 @@ public class Ic3CommandLineArguments extends CommandLineArguments {
   }
 
   /**
-   * Process the command line arguments after initial parsing. This should be called by actually
+   * Returns the destination protocol buffer file path.
+   * 
+   * @return The destination path if any, otherwise null.
+   */
+  public String getProtobufDestination() {
+    return protobufDestination;
+  }
+
+  /**
+   * Determines if the output should be binary, in the case of a protobuf output.
+   * 
+   * @return True if the output should be binary.
+   */
+  public boolean binary() {
+    return binary;
+  }
+
+  /**
+   * Returns the name of the sample.
+   * 
+   * @return The sample name, if any, otherwise null.
+   */
+  public String getSample() {
+    return sample;
+  }
+
+  /**
+   * Process the command line arguments after initial parsing. This should be called be actually
    * using the arguments contained in this class.
    */
   public void processCommandLineArguments() {
@@ -100,6 +135,8 @@ public class Ic3CommandLineArguments extends CommandLineArguments {
     if (getCompiledModel() == null && getModel() == null) {
       setCompiledModel(DEFAULT_COMPILED_MODEL_PATH);
     }
+
+    iccStudy = getOptionValue("iccstudy");
 
     if (hasOption("db")) {
       db = getOptionValue("db", DEFAULT_DATABASE_PROPERTIES_PATH);
@@ -122,5 +159,14 @@ public class Ic3CommandLineArguments extends CommandLineArguments {
     }
 
     computeComponents = hasOption("computecomponents") || db != null;
+
+    if (hasOption("protobuf")) {
+      protobufDestination = getOptionValue("protobuf");
+    }
+
+    computeComponents = hasOption("computecomponents") || db != null || protobufDestination != null;
+    binary = hasOption("binary");
+
+    sample = getOptionValue("sample");
   }
 }
