@@ -235,11 +235,8 @@ public class Ic3Analysis extends Analysis<Ic3CommandLineArguments> {
   }
 
   protected void prepareManifestFile(Ic3CommandLineArguments commandLineArguments) {
-    if (commandLineArguments.getDb() != null
-        || commandLineArguments.getProtobufDestination() != null) {
       detailedManifest = new ManifestPullParser();
       detailedManifest.loadManifestFile(commandLineArguments.getManifest());
-    }
   }
 
   @Override
